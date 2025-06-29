@@ -1,0 +1,53 @@
+{
+  "required": "This field is required",
+  "minLength": "Minimum length: {length}",
+  "maxLength": "Maximum length: {length}",
+  "min": "Minimum value: {min}",
+  "max": "Maximum value: {max}",
+  "integer": "Value must be an integer",
+  "positive": "Value must be positive",
+  "pattern": "Value does not match the required format",
+  "invalidFormat": "Invalid format",
+  
+  "email": {
+    "required": "Email is required",
+    "invalid": "Invalid email format"
+  },
+  
+  "password": {
+    "required": "Password is required",
+    "minLength": "Password must be at least 8 characters long",
+    "maxLength": "Password should not exceed 50 characters",
+    "pattern": "Password must contain at least one uppercase letter and one special character",
+    "complexity": "Password must contain an uppercase letter and a special character",
+    "mismatch": "Passwords do not match",
+    "confirmRequired": "Password confirmation is required",
+    "digit": "Password must contain at least one digit",
+    "special": "Password must contain at least one special character",
+    "uppercase": "Password must contain at least one uppercase letter"
+  },
+  
+  "name": {
+    "required": "First name is required",
+    "minLength": "First name must contain at least 3 characters",
+    "maxLength": "First name cannot be longer than 50 characters",
+    "pattern": "First name must start with an uppercase letter and contain only letters",
+    "uppercase": "First name must start with an uppercase letter"
+  },
+  
+  "lastName": {
+    "required": "Last name is required",
+    "minLength": "Last name must contain at least 3 characters",
+    "maxLength": "Last name cannot be longer than 50 characters",
+    "pattern": "Last name must start with an uppercase letter and contain only letters"
+  },
+  
+  "phone": {
+    "required": "Phone number is required",
+    "pattern": "Phone number must start with +7 or 8 and contain 11 digits"
+  },
+  
+  "match": "Values do not match",
+  "onlyRussian": "The field must contain only Russian letters",
+  "onlyEnglish": "The field must contain only English letters"
+}

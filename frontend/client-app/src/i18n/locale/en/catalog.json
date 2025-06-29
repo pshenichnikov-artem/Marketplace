@@ -1,0 +1,10 @@
+{
+  "title": "Product Catalog",
+  "inStock": "In stock",
+  "seller": "Seller",
+  "reviews": "reviews",
+  "details": "Details",
+  "noProductsFound": "No products found",
+  "tryChangingFilters": "Try changing your search or filters",
+  "resetFilters": "Reset filters"
+}

@@ -1,0 +1,20 @@
+{
+  "addToCart": "Add to Cart",
+  "description": "Description",
+  "seller": "Seller",
+  "category": "Category",
+  "inStock": "In Stock",
+  "reviews": "Reviews",
+  "noReviews": "No reviews yet. Be the first to leave a review!",
+  "loading": "Loading...",
+  "error": "Error loading product",
+  "addedToCart": "Product added to cart",
+  "leaveReview": "Leave a review",
+  "unknownCategory": "Unknown category",
+  "removeFromCart": "Remove from cart",
+  "goToCart": "Go to cart",
+  "quantity": "Quantity",
+  "maxQuantity": "Maximum: {max} items",
+  "delivery": "Delivery",
+  "days": "days"
+}

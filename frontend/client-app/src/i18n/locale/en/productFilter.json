@@ -1,0 +1,23 @@
+{
+  "category": "Category",
+  "categoryPlaceholder": "Select category",
+  "sortBy": "Sort by",
+  "minPrice": "Min price",
+  "maxPrice": "Max price",
+  "minPricePlaceholder": "From",
+  "maxPricePlaceholder": "To",
+  "all": "All categories",
+  "popularity": "Popularity",
+  "priceAsc": "Price (ascending)",
+  "priceDesc": "Price (descending)",
+  "name": "Name",
+  "ratingHigh": "Highest rating",
+  "ratingLow": "Lowest rating",
+  "newest": "Newest first",
+  "oldest": "Oldest first",
+  "reviewsHigh": "Most reviews",
+  "reviewsLow": "Least reviews",
+  "noResults": "No categories found",
+  "filterTitle": "Filters",
+  "reset": "Reset filters"
+}

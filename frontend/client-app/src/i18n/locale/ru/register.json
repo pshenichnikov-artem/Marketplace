@@ -1,0 +1,15 @@
+{
+  "title": "Регистрация",
+  "firstName": "Имя",
+  "lastName": "Фамилия",
+  "email": "Электронная почта",
+  "phone": "Телефон",
+  "password": "Пароль",
+  "confirmPassword": "Подтвердите пароль",
+  "selectRole": "Выберите роль",
+  "roleUser": "Покупатель",
+  "roleSeller": "Продавец",
+  "registerButton": "Зарегистрироваться",
+  "loginButton": "У меня уже есть аккаунт",
+  "registerError": "Ошибка при регистрации"
+}

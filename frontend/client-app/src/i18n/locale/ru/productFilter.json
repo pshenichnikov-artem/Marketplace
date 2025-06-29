@@ -1,0 +1,23 @@
+{
+  "category": "Категория",
+  "categoryPlaceholder": "Выбрать категорию",
+  "sortBy": "Сортировать по",
+  "minPrice": "Цена от",
+  "maxPrice": "Цена до",
+  "minPricePlaceholder": "От",
+  "maxPricePlaceholder": "До",
+  "all": "Все категории",
+  "popularity": "По популярности",
+  "priceAsc": "По цене (возр.)",
+  "priceDesc": "По цене (убыв.)",
+  "name": "По названию",
+  "ratingHigh": "Высокий рейтинг",
+  "ratingLow": "Низкий рейтинг",
+  "newest": "Сначала новые",
+  "oldest": "Сначала старые",
+  "reviewsHigh": "Много отзывов",
+  "reviewsLow": "Мало отзывов",
+  "noResults": "Категории не найдены",
+  "filterTitle": "Фильтры",
+  "reset": "Сбросить фильтры"
+}

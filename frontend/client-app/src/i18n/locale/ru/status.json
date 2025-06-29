@@ -1,0 +1,40 @@
+{
+  "common": {
+    "Active": "Активен",
+    "Inactive": "Неактивен",
+    "Published": "Опубликован",
+    "Draft": "Черновик",
+    "Processing": "В обработке",
+    "Completed": "Завершен",
+    "Failed": "Ошибка",
+    "Pending": "Ожидает",
+    "Cancelled": "Отменен",
+    "InTransit": "В пути",
+    "Delivered": "Доставлен",
+    "Waiting": "Ожидание",
+    "Paid": "Оплачен",
+    "Unpaid": "Не оплачен",
+    "Refunded": "Возвращен"
+  },
+  "orders": {
+    "Pending": "В обработке",
+    "Processing": "Обрабатывается",
+    "InTransit": "В пути",
+    "Delivered": "Доставлен",
+    "Cancelled": "Отменен",
+    "Completed": "Завершен",
+    "Waiting": "Ожидание"
+  },
+  "products": {
+    "Active": "Активен",
+    "Inactive": "Неактивен",
+    "Published": "Опубликован",
+    "Draft": "Черновик"
+  },
+  "payments": {
+    "Paid": "Оплачен",
+    "Unpaid": "Не оплачен",
+    "Refunded": "Возвращен",
+    "Failed": "Ошибка оплаты"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "common": {
+    "Active": "Active",
+    "Inactive": "Inactive",
+    "Published": "Published",
+    "Draft": "Draft",
+    "Processing": "Processing",
+    "Completed": "Completed",
+    "Failed": "Failed",
+    "Pending": "Pending",
+    "Cancelled": "Cancelled",
+    "InTransit": "In Transit",
+    "Delivered": "Delivered",
+    "Waiting": "Waiting",
+    "Paid": "Paid",
+    "Unpaid": "Unpaid",
+    "Refunded": "Refunded"
+  },
+  "orders": {
+    "Pending": "Pending",
+    "Processing": "Processing",
+    "InTransit": "In Transit",
+    "Delivered": "Delivered",
+    "Cancelled": "Cancelled",
+    "Completed": "Completed",
+    "Waiting": "Waiting"
+  },
+  "products": {
+    "Active": "Active",
+    "Inactive": "Inactive",
+    "Published": "Published",
+    "Draft": "Draft"
+  },
+  "payments": {
+    "Paid": "Paid",
+    "Unpaid": "Unpaid",
+    "Refunded": "Refunded",
+    "Failed": "Payment Failed"
+  }
+}

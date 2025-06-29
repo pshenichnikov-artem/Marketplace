@@ -1,0 +1,14 @@
+{
+  "title": "Checkout",
+  "deliveryAddress": "Delivery Address",
+  "comment": "Order Comment",
+  "enterComment": "Additional information for the courier",
+  "placeOrder": "Place Order",
+  "searchAddress": "Search Address",
+  "enterAddress": "Enter delivery address",
+  "coordinates": "Coordinates",
+  "pleaseSpecifyAddress": "Please specify a delivery address",
+  "invalidCoordinates": "Invalid coordinates. Please select an address again",
+  "orderSuccess": "Order successfully placed!",
+  "orderError": "Error placing order. Please try again"
+}

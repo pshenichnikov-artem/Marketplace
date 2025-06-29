@@ -1,0 +1,15 @@
+{
+  "welcome": "Welcome to our store!",
+  "content": "Here you will find a wide range of products at competitive prices.",
+  "featuredBanners": "Featured Offers",
+  "viewDetails": "View Details",
+  "categories": {
+    "title": "Categories",
+    "viewAll": "View All"
+  },
+  "popularProducts": {
+    "title": "Popular Products",
+    "viewAll": "View All"
+  },
+  "recentlyViewed": "Recently Viewed"
+}

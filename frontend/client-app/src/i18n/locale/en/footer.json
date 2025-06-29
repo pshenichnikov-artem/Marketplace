@@ -1,0 +1,22 @@
+{
+  "allRightsReserved": "All rights reserved",
+  "aboutUs": {
+    "title": "About Us",
+    "description": "We offer quality products and services to our customers. Our goal is to create a convenient platform for sellers and buyers."
+  },
+  "usefulLinks": {
+    "title": "Useful Links",
+    "home": "Home",
+    "products": "Products",
+    "services": "Services",
+    "about": "About",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "address": "123 Example St, City, 12345",
+    "phone": "+1 (123) 456-7890",
+    "email": "info@example.com"
+  }
+}

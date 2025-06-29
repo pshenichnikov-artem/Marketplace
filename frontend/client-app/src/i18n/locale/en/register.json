@@ -1,0 +1,15 @@
+{
+  "title": "Registration",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
+  "phone": "Phone",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "selectRole": "Select Role",
+  "roleUser": "Customer",
+  "roleSeller": "Seller",
+  "registerButton": "Register",
+  "loginButton": "I already have an account",
+  "registerError": "Registration error"
+}

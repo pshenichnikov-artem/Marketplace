@@ -1,0 +1,16 @@
+{
+  "appName": "ShopApp",
+  "searchPlaceholder": "Search products...",
+  "catalog": "Catalog",
+  "cart": "Cart",
+  "controlPanel": "Control Panel",
+  "profile": "Profile",
+  "logout": "Logout",
+  "login": "Login",
+  "register": "Register",
+  "searchHint": "Press to search",
+  "noResults": "No results found",
+  "viewAllResults": "View all results",
+  "searching": "Searching...",
+  "dashboard": "Dashboard"
+}

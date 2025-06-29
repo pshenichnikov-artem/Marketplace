@@ -1,0 +1,16 @@
+{
+  "appName": "МагазинApp",
+  "searchPlaceholder": "Поиск товаров...",
+  "catalog": "Каталог",
+  "cart": "Корзина",
+  "controlPanel": "Панель управления",
+  "profile": "Профиль",
+  "logout": "Выйти",
+  "login": "Вход",
+  "register": "Регистрация",
+  "searchHint": "Нажмите для поиска",
+  "noResults": "Ничего не найдено",
+  "viewAllResults": "Показать все результаты",
+  "searching": "Поиск...",
+  "dashboard": "Панель управления"
+}

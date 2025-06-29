@@ -1,0 +1,9 @@
+﻿{
+  "title": "Login",
+  "email": "Email",
+  "password": "Password",
+  "loginButton": "Login",
+  "registerButton": "Register",
+  "loginError": "Login error. Please check your credentials and try again.",
+  "clearForm": "Clear form"
+}

@@ -1,0 +1,6 @@
+{
+  "emailAlreadyExists": "A user with this email is already registered",
+  "invalidCredentials": "Invalid username or password",
+  "unexpectedError": "An unexpected error occurred",
+  "networkError": "Server connection error. Please check your internet connection or try again later."
+}
