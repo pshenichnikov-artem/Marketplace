@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- Редактор Quill всегда присутствует в DOM, но скрывается при необходимости -->
         <div :class="{ 'hidden': editorMode !== 'wysiwyg' }" class="border rounded-lg overflow-hidden h-300">
             <!-- Панель форматирования -->
             <div id="toolbar" class="border-b">
@@ -113,14 +112,12 @@ import { useI18n } from 'vue-i18n';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
-// Импорт необходимых форматов для Quill
 const List = Quill.import('formats/list');
 const Bold = Quill.import('formats/bold');
 const Italic = Quill.import('formats/italic');
 const Header = Quill.import('formats/header');
 const Link = Quill.import('formats/link');
 
-// Регистрация дополнительных шрифтов для Quill
 const FontAttributor = Quill.import('attributors/class/font');
 FontAttributor.whitelist = [
     'arial',
@@ -133,7 +130,6 @@ FontAttributor.whitelist = [
 ];
 Quill.register(FontAttributor, true);
 
-// Явно регистрируем основные форматы
 Quill.register(List, true);
 Quill.register(Bold, true);
 Quill.register(Italic, true);
@@ -164,64 +160,51 @@ export default {
         const htmlEditor = ref(null);
         const editor = ref(null);
 
-        // Храним совершенно отдельные значения для каждого редактора
         const htmlContent = ref('');
         const visualContent = ref('');
 
-        // Режим редактирования (вычисляемое свойство для управления из родителя)
         const editorMode = computed({
             get: () => props.mode,
             set: (newMode) => emit('update:mode', newMode)
         });
 
-        // HTML-контент с двусторонней привязкой
         const htmlContentModel = computed({
             get: () => htmlContent.value,
             set: (newValue) => {
                 htmlContent.value = newValue;
-                // Обновляем внешнее значение только если активен HTML редактор
                 if (editorMode.value === 'html') {
                     emit('update:value', newValue);
                 }
             }
         });
 
-        // Обработчик изменений HTML-редактора
         const onHtmlContentInput = (event) => {
             const newContent = event.target.value;
             htmlContent.value = newContent;
 
-            // Обновляем внешнее значение только если активен HTML редактор
             if (editorMode.value === 'html') {
                 emit('update:value', newContent);
             }
             console.log('HTML editor content updated:', newContent);
         };
 
-        // Обработка изменения режима редактирования
         watch(() => props.mode, (newMode, oldMode) => {
             console.log(`Editor mode changed from ${oldMode} to ${newMode}`);
 
             if (newMode === 'html') {
-                // При переключении на HTML режим просто обновляем внешнее значение
                 emit('update:value', htmlContent.value);
 
-                // Фокус на HTML редактор
                 setTimeout(() => {
                     if (htmlEditor.value) {
                         htmlEditor.value.focus();
                     }
                 }, 100);
             } else if (newMode === 'wysiwyg') {
-                // При переключении на WYSIWYG режим
                 try {
                     if (editor.value) {
-                        // Теперь НЕ копируем содержимое между редакторами при переключении
 
-                        // Обновляем внешнее значение с текущим визуальным контентом
                         emit('update:value', visualContent.value);
 
-                        // Фокус на WYSIWYG редактор
                         setTimeout(() => {
                             editor.value.focus();
                         }, 100);
@@ -231,16 +214,13 @@ export default {
                     if (props.toast) {
                         props.toast.error(t('dashboard.pages.wysiwyg.error'));
                     }
-                    // Возвращаемся к HTML режиму при ошибке
                     emit('update:mode', 'html');
                 }
             }
         });
 
-        // Инициализация редактора Quill
         const initQuill = () => {
             try {
-                // Создаем экземпляр Quill с настройками
                 editor.value = new Quill(quillEditor.value, {
                     modules: {
                         toolbar: '#toolbar',
@@ -254,7 +234,6 @@ export default {
                     placeholder: 'Начните вводить содержимое страницы...',
                 });
 
-                // Добавляем горячие клавиши
                 editor.value.keyboard.addBinding({ key: 'B', shortKey: true }, function (range, context) {
                     this.quill.format('bold', !context.format.bold);
                 });
@@ -267,10 +246,8 @@ export default {
                     this.quill.format('underline', !context.format.underline);
                 });
 
-                // Устанавливаем начальное содержимое для соответствующего редактора
                 if (props.value) {
                     try {
-                        // Задаем начальное значение обоих редакторов
                         visualContent.value = props.value;
                         htmlContent.value = props.value;
 
@@ -283,19 +260,16 @@ export default {
                     }
                 }
 
-                // Слушатель изменений редактора
                 editor.value.on('text-change', function () {
                     const content = editor.value.root.innerHTML;
                     visualContent.value = content;
 
-                    // Обновляем внешнее значение только если активен визуальный редактор
                     if (editorMode.value === 'wysiwyg') {
                         emit('update:value', content);
                     }
                     console.log('WYSIWYG editor content updated:', content);
                 });
 
-                // Улучшенная обработка клика
                 editor.value.root.addEventListener('click', function () {
                     editor.value.focus();
                 });
@@ -307,23 +281,18 @@ export default {
             }
         };
 
-        // При обновлении внешнего значения обновляем только активный редактор
         watch(() => props.value, (newValue) => {
             if (editorMode.value === 'wysiwyg') {
                 visualContent.value = newValue;
                 if (editor.value) {
                     try {
-                        // Временно отключаем слушатели
                         const textChangeListeners = editor.value.emitter?.listeners('text-change') || [];
                         editor.value.emitter.removeAllListeners('text-change');
 
-                        // Только если контент реально изменился, обновляем Quill
-                        // Это предотвращает сброс фокуса и курсора при каждом вводе
                         if (editor.value.root.innerHTML !== (newValue || '')) {
                             editor.value.root.innerHTML = newValue || '';
                         }
 
-                        // Восстанавливаем слушатели
                         if (Array.isArray(textChangeListeners)) {
                             textChangeListeners.forEach(listener => {
                                 editor.value.emitter.on('text-change', listener);
@@ -338,19 +307,14 @@ export default {
             }
         });
 
-        // Инициализация при монтировании компонента
         onMounted(() => {
             initQuill();
 
-            // Устанавливаем начальные значения для обоих редакторов
-            // НО не связываем их между собой
             htmlContent.value = props.value || '';
             visualContent.value = props.value || '';
 
-            // Устанавливаем начальное содержимое в редактор Quill
             if (editor.value && props.value) {
                 try {
-                    // Заменяем неопределенный метод на прямую установку HTML
                     editor.value.root.innerHTML = props.value || '';
                 } catch (error) {
                     console.error("Error setting initial Quill content:", error);
@@ -373,7 +337,6 @@ export default {
 </script>
 
 <style scoped>
-/* Добавляем стили для редактора Quill */
 .quill-editor {
     height: 600px !important;
     max-height: 600px !important;
@@ -382,7 +345,6 @@ export default {
     z-index: 1;
 }
 
-/* Ensure the Quill content area doesn't expand */
 :deep(.ql-container) {
     height: 500px !important;
     max-height: 500px !important;
@@ -391,7 +353,6 @@ export default {
     z-index: 1;
 }
 
-/* Стили для панели инструментов */
 :deep(.ql-toolbar) {
     border-bottom: 1px solid #e2e8f0;
     padding: 12px !important;
@@ -408,7 +369,6 @@ export default {
     align-items: center !important;
 }
 
-/* Стили для кнопок панели инструментов */
 :deep(.ql-toolbar button) {
     height: 28px !important;
     width: 28px !important;
@@ -422,7 +382,6 @@ export default {
     background-color: #eef2ff !important;
 }
 
-/* Стили для выпадающих списков */
 :deep(.ql-toolbar .ql-picker) {
     height: 28px !important;
     margin-right: 5px !important;
@@ -436,7 +395,6 @@ export default {
     align-items: center !important;
 }
 
-/* Исправление для выпадающих списков */
 :deep(.ql-picker-options) {
     display: none !important;
     z-index: 10 !important;
@@ -448,14 +406,12 @@ export default {
     min-width: 120px !important;
 }
 
-/* Исправление для отображения выпадающих списков только при наведении/фокусе */
 :deep(.ql-picker.ql-expanded .ql-picker-options) {
     display: block !important;
     margin-top: 5px !important;
     z-index: 20 !important;
 }
 
-/* Стилизация элементов в выпадающем меню */
 :deep(.ql-picker-item) {
     padding: 5px 8px !important;
     cursor: pointer !important;
@@ -465,7 +421,6 @@ export default {
     background-color: #f3f4f6 !important;
 }
 
-/* Добавляем специальные стили для HTML редактора */
 textarea.w-full {
     font-family: monospace;
     color: #333;
@@ -473,15 +428,12 @@ textarea.w-full {
     tab-size: 2;
 }
 
-/* Улучшенный стиль фокуса для текстового редактора */
 textarea:focus {
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 </style>
 
-<!-- Глобальные стили для отображения форматирования -->
 <style>
-/* Глобальные стили для шрифтов */
 .ql-font-arial {
     font-family: Arial, sans-serif;
 }
@@ -510,7 +462,6 @@ textarea:focus {
     font-family: "Times New Roman", Times, serif;
 }
 
-/* Стили для размеров текста */
 .ql-size-small {
     font-size: 0.75em;
 }
@@ -523,7 +474,6 @@ textarea:focus {
     font-size: 2.5em;
 }
 
-/* Стили для выравнивания */
 .ql-align-center {
     text-align: center;
 }
@@ -536,7 +486,6 @@ textarea:focus {
     text-align: justify;
 }
 
-/* Стили для списков */
 .ql-indent-1 {
     padding-left: 3em;
 }
@@ -549,7 +498,6 @@ textarea:focus {
     padding-left: 9em;
 }
 
-/* Стили для блока кода */
 .ql-syntax {
     background-color: #f0f0f0;
     border-radius: 3px;
@@ -558,7 +506,6 @@ textarea:focus {
     white-space: pre-wrap;
 }
 
-/* Стили для блок-цитат */
 .ql-editor blockquote {
     border-left: 4px solid #ccc;
     padding-left: 16px;
@@ -566,12 +513,10 @@ textarea:focus {
     margin-right: 0;
 }
 
-/* Стили для направления текста */
 [dir=rtl] {
     text-align: right;
 }
 
-/* Фиксация проблемы с выпадающими меню Quill */
 .ql-picker-label {
     position: relative !important;
     z-index: 5 !important;
@@ -613,14 +558,12 @@ textarea:focus {
     color: #4f46e5 !important;
 }
 
-/* Дополнительные стили для лучшего отображения выпадающих списков */
 .ql-picker {
     display: inline-block !important;
     position: relative !important;
     vertical-align: middle !important;
 }
 
-/* Улучшаем внешний вид кнопок и выпадающих списков */
 .ql-formats {
     display: inline-block !important;
     margin-right: 15px !important;

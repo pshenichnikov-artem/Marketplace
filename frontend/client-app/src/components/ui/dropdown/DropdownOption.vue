@@ -69,11 +69,9 @@ export default {
       return this.option.children && this.option.children.length > 0;
     },
     isSelected() {
-      // Проверка, является ли опция выбранной, для отображения галочки
       return this.$parent.modelValue === this.option.id ||
         this.$parent.modelValue === this.option.value;
     },
-    // Создаем путь для текущего элемента, добавляя его id к родительскому пути
     currentPath() {
       const id = this.option.id || this.option.value;
       return [...this.parentPath, id];
@@ -82,44 +80,36 @@ export default {
   methods: {
     handleClick(event) {
       if (this.hasChildren) {
-        // Если есть дочерние элементы, открываем/закрываем подменю
-        // при клике на основную часть элемента
+
         if (this.selectOnlyLeaf) {
           this.toggleSubmenu(event);
         } else {
-          // Если разрешено выбирать родительские элементы
           this.$emit('select', this.option);
         }
       } else {
-        // Если нет дочерних элементов, просто выбираем опцию
         this.$emit('select', this.option);
       }
     },
     toggleSubmenu(event) {
       event.stopPropagation();
 
-      // Закрываем только субменю того же уровня, но не родительские или дочерние
       this.closeAllSiblingSubmenus();
 
-      // Переключаем состояние текущего подменю
       this.submenuOpen = !this.submenuOpen;
 
       if (this.submenuOpen) {
         this.$nextTick(() => {
-          // Получаем размеры родительского элемента для правильного позиционирования
           const parentElement = event.currentTarget.closest('li');
           const rect = parentElement.getBoundingClientRect();
 
-          // Устанавливаем позицию подменю относительно родительского элемента
           this.submenuPosition = {
             top: `${rect.top}px`,
-            left: `${rect.right + 5}px` // 5px отступ от родительского элемента
+            left: `${rect.right + 5}px`
           };
         });
       }
     },
     closeAllSiblingSubmenus() {
-      // Создаем кастомное событие с передачей текущего пути и уровня
       const event = new CustomEvent('close-sibling-submenus', {
         detail: {
           path: this.currentPath,
@@ -129,20 +119,17 @@ export default {
       });
       document.dispatchEvent(event);
     },
-    // Обработчик события закрытия субменю
     handleCloseSubmenus(event) {
       const { path, parentPath, level } = event.detail;
 
-      // Закрываем только меню того же уровня (с тем же родителем), но не если это наш предок или потомок
-      if (level === this.parentPath.length && // тот же уровень
-        JSON.stringify(parentPath) === JSON.stringify(this.parentPath) && // тот же родитель
-        path[path.length - 1] !== (this.option.id || this.option.value)) { // не сам текущий элемент
+      if (level === this.parentPath.length &&
+        JSON.stringify(parentPath) === JSON.stringify(this.parentPath) &&
+        path[path.length - 1] !== (this.option.id || this.option.value)) {
         this.submenuOpen = false;
       }
     }
   },
   created() {
-    // Слушаем событие для закрытия субменю
     this.closeSubmenuHandler = this.handleCloseSubmenus.bind(this);
     document.addEventListener('close-sibling-submenus', this.closeSubmenuHandler);
   },
@@ -182,7 +169,6 @@ export default {
   opacity: 1;
 }
 
-/* Анимация для подменю */
 .submenu-enter-active,
 .submenu-leave-active {
   transition: opacity 0.2s, transform 0.2s;

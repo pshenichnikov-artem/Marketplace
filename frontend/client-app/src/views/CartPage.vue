@@ -6,10 +6,8 @@
         <h1 class="text-3xl font-bold text-gray-900">{{ $t('cart.title') }}</h1>
       </div>
 
-      <!-- Используем StateWrapper для корзины -->
       <StateWrapper :loading="loading" :error="error" :is-empty="!cart || !cart.items || cart.items.length === 0"
         :empty-message="$t('cart.empty')">
-        <!-- Кастомное отображение пустой корзины -->
         <template #empty>
           <div class="bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">
             <div class="flex flex-col items-center justify-center py-12">
@@ -88,7 +86,6 @@
     <CheckoutModal v-if="isCheckoutModalOpen" :total-amount="total" :items="cart ? cart.items : []"
       @close="isCheckoutModalOpen = false" @order-submitted="processOrder" />
 
-    <!-- Компонент уведомлений -->
     <Notification ref="toast" />
   </div>
 </template>
@@ -128,12 +125,10 @@ export default {
     const toast = ref(null);
     const cartStore = useCartStore();
 
-    // API хуки
     const { loading, error, execute: executeCartLoad } = useApiRequest();
     const { execute: executeOrder } = useApiRequest();
     const { execute: executeCartClear } = useApiRequest();
 
-    // Вычисляемые значения
     const subtotal = computed(() => {
       if (!cart.value || !cart.value.items || cart.value.items.length === 0) return 0;
       return cart.value.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
@@ -143,7 +138,6 @@ export default {
       return subtotal.value + shipping.value + tax.value - discount.value;
     });
 
-    // Загрузка корзины
     const fetchCart = async () => {
       await executeCartLoad(async () => {
         return await cartService.getCart("self");
@@ -156,7 +150,6 @@ export default {
       });
     };
 
-    // Обработка изменения состояния загрузки для отдельных элементов
     const handleLoadingState = (itemId, isLoading) => {
       if (isLoading) {
         loadingItems.value.add(itemId);
@@ -165,7 +158,6 @@ export default {
       }
     };
 
-    // Обновление количества товара в корзине
     const handleQuantityUpdated = (itemId, newQuantity) => {
       const item = cart.value.items.find(item => item.id === itemId);
       if (item) {
@@ -173,19 +165,15 @@ export default {
       }
     };
 
-    // Удаление товара из корзины
     const handleItemDeleted = (itemId) => {
       cart.value.items = cart.value.items.filter(item => item.id !== itemId);
-      // Уведомляем MainNavbar об удалении элемента из корзины
       cartStore.delta(-1);
     };
 
-    // Открытие модального окна оформления заказа
     const checkout = () => {
       isCheckoutModalOpen.value = true;
     };
 
-    // Обработка заказа
     const processOrder = async (orderData) => {
       await executeOrder(async () => {
         const orderRequest = {
@@ -199,10 +187,9 @@ export default {
       }, {
         onSuccess: () => {
           toast.value.success(t('checkout.orderSuccess'));
-          // При успешном оформлении заказа уведомляем о очистке корзины
           const itemsCount = cart.value.items.length;
           clearCart();
-          cartStore.delta(-itemsCount); // Уменьшаем счетчик на количество элементов в корзине
+          cartStore.delta(-itemsCount);
         },
         showErrorNotification: true,
         notificationRef: toast
@@ -211,7 +198,6 @@ export default {
       isCheckoutModalOpen.value = false;
     };
 
-    // Очистка корзины
     const clearCart = async () => {
       if (!cart.value || !cart.value.items || cart.value.items.length === 0) {
         return;
@@ -220,8 +206,6 @@ export default {
       const itemIds = cart.value.items.map(item => item.id);
 
       await executeCartClear(async () => {
-        // Последовательное удаление всех элементов из корзины
-        // В реальном API должен быть метод для очистки всей корзины сразу
         for (const itemId of itemIds) {
           await cartService.removeCartItem(itemId);
         }
@@ -235,12 +219,10 @@ export default {
       });
     };
 
-    // Форматирование валюты
     const formatCurrency = (value) => {
       return `${value.toLocaleString()} ₽`;
     };
 
-    // Загрузка данных
     onMounted(() => {
       fetchCart();
     });
@@ -270,7 +252,6 @@ export default {
 </script>
 
 <style scoped>
-/* Стили для анимации загрузки */
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -281,7 +262,6 @@ export default {
   }
 }
 
-/* Улучшенные стили для корзины */
 .bg-white {
   transition: all 0.3s ease;
 }
@@ -290,7 +270,6 @@ export default {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* Стили для мобильных устройств */
 @media (max-width: 640px) {
   .container {
     padding: 0;

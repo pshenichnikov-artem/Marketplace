@@ -24,7 +24,6 @@
             <div v-else class="p-6">
                 <p class="text-gray-600 mb-4">{{ $t('profile.reviewManager.description') }}</p>
 
-                <!-- Горизонтальный скролл с товарами (одна линия) -->
                 <div class="overflow-x-auto horizontal-scroll">
                     <div class="flex gap-4 pb-2 inline-flex">
                         <div v-for="product in availableProducts" :key="product.id"
@@ -48,7 +47,6 @@
             </div>
         </div>
 
-        <!-- Модальное окно для добавления отзыва -->
         <div v-if="showReviewModal"
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden" @click.stop>
@@ -139,14 +137,12 @@ export default {
         const selectedProduct = ref(null);
         const rating = ref(5);
         const comment = ref('');
-        const commentError = ref(''); // Новое состояние для отображения ошибки комментария
+        const commentError = ref('');
 
-        // Получение списка продуктов, для которых можно оставить отзыв
         const availableProducts = computed(() => {
 
             if (!orders.value.length) return [];
 
-            // Собираем все купленные продукты из заказов
             const purchasedProductsMap = {};
             orders.value.forEach(order => {
                 if (order.status !== 'canceled') {
@@ -154,7 +150,6 @@ export default {
                         if (item.productId && productsMap.value[item.productId]) {
                             const product = productsMap.value[item.productId];
 
-                            // Используем Map для хранения уникальных продуктов
                             purchasedProductsMap[item.productId] = {
                                 id: item.productId,
                                 name: product.name,
@@ -166,16 +161,13 @@ export default {
                 }
             });
 
-            // Фильтруем продукты, исключая те, на которые уже оставлен отзыв
             const reviewedProductIds = new Set(reviews.value.map(review => review.productId));
 
-            // Возвращаем массив доступных для отзывов продуктов
             return Object.values(purchasedProductsMap).filter(product =>
                 !reviewedProductIds.has(product.id)
             );
         });
 
-        // Загрузка данных
         const fetchData = async () => {
             await Promise.all([
                 fetchOrders(),
@@ -183,7 +175,6 @@ export default {
             ]);
         };
 
-        // Загрузка заказов
         const fetchOrders = async () => {
             await executeOrders(async () => {
                 return await orderService.getMyOrders();
@@ -191,7 +182,6 @@ export default {
                 onSuccess: async (data) => {
                     orders.value = data || [];
 
-                    // Если есть заказы, загружаем информацию о продуктах
                     if (orders.value.length) {
                         await fetchProductsInfo();
                     }
@@ -200,7 +190,6 @@ export default {
             });
         };
 
-        // Загрузка отзывов
         const fetchReviews = async () => {
             await executeReviews(async () => {
                 return await reviewService.getMyReview();
@@ -212,9 +201,7 @@ export default {
             });
         };
 
-        // Загрузка детальной информации о продуктах
         const fetchProductsInfo = async () => {
-            // Собираем все уникальные идентификаторы продуктов из заказов
             const productIds = new Set();
             orders.value.forEach(order => {
                 order.items?.forEach(item => {
@@ -222,7 +209,6 @@ export default {
                 });
             });
 
-            // Загружаем информацию о продуктах батчами
             const batchSize = 5;
             const productIdBatches = Array.from(productIds).reduce((batches, id, i) => {
                 const batchIndex = Math.floor(i / batchSize);
@@ -241,7 +227,6 @@ export default {
             }
         };
 
-        // Форматирование даты заказа
         const formatDate = (dateString) => {
             if (!dateString) return '';
             const date = new Date(dateString);
@@ -252,23 +237,20 @@ export default {
             }).format(date);
         };
 
-        // Открытие модального окна для добавления отзыва
         const openReviewModal = (product) => {
             selectedProduct.value = product;
             rating.value = 5;
             comment.value = '';
-            commentError.value = ''; // Сбрасываем ошибку при открытии модального окна
+            commentError.value = '';
             showReviewModal.value = true;
         };
 
-        // Закрытие модального окна
         const closeReviewModal = () => {
             showReviewModal.value = false;
             selectedProduct.value = null;
-            commentError.value = ''; // Сбрасываем ошибку при закрытии модального окна
+            commentError.value = '';
         };
 
-        // Валидация комментария
         const validateComment = () => {
             if (!comment.value.trim()) {
                 commentError.value = t('profile.reviewManager.emptyCommentError');
@@ -278,14 +260,11 @@ export default {
             return true;
         };
 
-        // Отправка отзыва
         const submitReview = async () => {
-            // Проверка на наличие выбранного продукта и рейтинга
             if (!selectedProduct.value || !rating.value) return;
 
-            // Проверка на пустой комментарий
             if (!validateComment()) {
-                return; // Прерываем отправку, если комментарий не прошел валидацию
+                return;
             }
 
             const reviewData = {
@@ -299,8 +278,7 @@ export default {
             }, {
                 onSuccess: (data) => {
                     if (data) {
-                        // Добавляем новый отзыв в список
-                        // Создаем полноценную структуру отзыва даже если сервер вернул только ID
+
                         const newReview = {
                             id: data.id || data,
                             productId: selectedProduct.value.id,
@@ -309,15 +287,11 @@ export default {
                         };
                         reviews.value.push(newReview);
 
-                        // Принудительно обновляем список доступных товаров
-                        // Обновляем заказы и отзывы, чтобы обновить список доступных товаров
                         fetchReviews();
                     }
 
-                    // Закрываем модальное окно
                     closeReviewModal();
 
-                    // Уведомляем родительский компонент о добавлении отзыва
                     emit('review-added', data);
                 },
                 showErrorNotification: true
@@ -335,13 +309,13 @@ export default {
             selectedProduct,
             rating,
             comment,
-            commentError, // Добавляем в возвращаемые значения
+            commentError,
             submitLoading,
             formatDate,
             openReviewModal,
             closeReviewModal,
             submitReview,
-            validateComment // Добавляем в возвращаемые значения
+            validateComment
         };
     }
 };
@@ -362,7 +336,6 @@ export default {
     overflow: hidden;
 }
 
-/* Анимация для звёзд рейтинга */
 button.text-yellow-400 {
     transform: scale(1.05);
     transition: transform 0.2s ease;
@@ -378,7 +351,6 @@ button.text-yellow-400 {
     animation: spin 1s linear infinite;
 }
 
-/* Стили для горизонтального скролла */
 .horizontal-scroll {
     scrollbar-width: thin;
     scrollbar-color: #d1d5db transparent;
@@ -405,38 +377,32 @@ button.text-yellow-400 {
     background-color: #9ca3af;
 }
 
-/* Ограничение ширины для контейнера, чтобы показывать максимум 5 товаров */
 @media (min-width: 1280px) {
     .horizontal-scroll {
         max-width: calc(64rem + 4rem);
-        /* 5 карточек по 256px (w-64) + 4 промежутка по 1rem (gap-4) */
     }
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
     .horizontal-scroll {
         max-width: calc(51.2rem + 3rem);
-        /* 4 карточки по 256px + 3 промежутка по 1rem */
     }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
     .horizontal-scroll {
         max-width: calc(38.4rem + 2rem);
-        /* 3 карточки по 256px + 2 промежутка по 1rem */
     }
 }
 
 @media (min-width: 640px) and (max-width: 767px) {
     .horizontal-scroll {
         max-width: calc(25.6rem + 1rem);
-        /* 2 карточки по 256px + 1 промежуток по 1rem */
     }
 }
 
 @media (max-width: 639px) {
     .horizontal-scroll {
-        /* 1 карточка на мобильных устройствах */
         max-width: 100%;
     }
 }

@@ -58,7 +58,6 @@
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
   </div>
 
-  <!-- Ничего не показываем, если баннеры не загружены и нет состояния загрузки -->
 </template>
 
 <script>
@@ -69,34 +68,28 @@ import useApiRequest from '@/hooks/useApiRequest';
 
 export default {
   name: 'BannerCarousel',
-  emits: ['bannersLoaded'], // Добавляем событие для оповещения родителя о загрузке баннеров
+  emits: ['bannersLoaded'],
   setup(props, { emit }) {
     const { t } = useI18n();
 
-    // Состояние компонента
     const currentSlide = ref(0);
     const autoPlayInterval = ref(null);
     const isTransitioning = ref(false);
-    const minBannerHeight = ref(240); // минимальная высота баннера в пикселях
+    const minBannerHeight = ref(240);
     const banners = ref([]);
 
-    // API хук
     const { loading: isLoading, error, execute } = useApiRequest();
 
-    // Проверка наличия баннеров
     const hasBanners = computed(() => {
       return banners.value && banners.value.length > 0;
     });
 
-    // Проверка, показывать ли по одному баннеру
     const showSingleBanner = computed(() => {
       return banners.value.length < 6;
     });
 
-    // Группируем баннеры
     const bannerGroups = computed(() => {
       const groups = [];
-      // Если баннеров меньше 6, показываем по одному
       const bannersPerPage = showSingleBanner.value ? 1 : 3;
 
       for (let i = 0; i < banners.value.length; i += bannersPerPage) {
@@ -106,7 +99,6 @@ export default {
       return groups;
     });
 
-    // Загрузка баннеров с использованием useApiRequest
     const loadBanners = async () => {
       await execute(async () => {
         return await bannerService.getBanners();
@@ -114,18 +106,16 @@ export default {
         onSuccess: (data) => {
           banners.value = data || [];
 
-          // Оповещаем родителя о состоянии баннеров
           emit('bannersLoaded', hasBanners.value);
 
           console.log('Баннеры успешно загружены:', hasBanners.value);
-          // После загрузки баннеров настраиваем карусель
           if (hasBanners.value) {
             setupCarousel();
           }
         },
         onError: (errorMsg) => {
           console.error('Ошибка при загрузке баннеров:', errorMsg);
-          banners.value = []; // Очищаем баннеры в случае ошибки
+          banners.value = [];
           emit('bannersLoaded', false);
         }
       });
@@ -133,7 +123,6 @@ export default {
       console.log('Загрузка баннеров завершена');
     };
 
-    // Методы управления слайдером
     const nextSlide = () => {
       if (isTransitioning.value || bannerGroups.value.length <= 1) return;
       isTransitioning.value = true;
@@ -168,11 +157,10 @@ export default {
       resetAutoPlay();
     };
 
-    // Автоматическая смена слайдов
     const startAutoPlay = () => {
       autoPlayInterval.value = setInterval(() => {
         nextSlide();
-      }, 20000); // 20 секунд
+      }, 20000);
     };
 
     const resetAutoPlay = () => {
@@ -180,13 +168,11 @@ export default {
       startAutoPlay();
     };
 
-    // Настройка карусели после загрузки баннеров
     const setupCarousel = () => {
       startAutoPlay();
       setupTouchControls();
     };
 
-    // Настройка сенсорного управления
     const setupTouchControls = () => {
       let touchStartX = 0;
       let touchEndX = 0;
@@ -214,7 +200,6 @@ export default {
         carouselElement.addEventListener('touchstart', handleTouchStart, false);
         carouselElement.addEventListener('touchend', handleTouchEnd, false);
 
-        // Сохраняем функции для последующего удаления
         carouselElement._touchHandlers = {
           start: handleTouchStart,
           end: handleTouchEnd
@@ -222,17 +207,13 @@ export default {
       }
     };
 
-    // Обработка изменения размера окна
     const handleResize = () => {
-      // Можно добавить дополнительную логику, например для адаптивной высоты
     };
 
-    // Очистка ресурсов
     const cleanup = () => {
       clearInterval(autoPlayInterval.value);
       window.removeEventListener('resize', handleResize);
 
-      // Удаляем обработчики событий сенсорного управления
       if (hasBanners.value) {
         const carouselElement = document.querySelector('.carousel-container');
         if (carouselElement && carouselElement._touchHandlers) {
@@ -242,7 +223,6 @@ export default {
       }
     };
 
-    // Хуки жизненного цикла
     onMounted(async () => {
       await loadBanners();
       window.addEventListener('resize', handleResize);
@@ -273,7 +253,6 @@ export default {
   position: relative;
   width: 100%;
   margin-bottom: 1.5rem;
-  /* Уменьшил отступ снизу */
   overflow: hidden;
 }
 
@@ -296,7 +275,6 @@ export default {
   padding: 0 10px;
 }
 
-/* Сетка баннеров */
 .banner-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -304,31 +282,24 @@ export default {
   width: 100%;
 }
 
-/* Стили для одиночного баннера */
 .banner-grid.single-banner {
   grid-template-columns: 1fr;
   max-width: 800px;
-  /* Уменьшил максимальную ширину с 1000px */
   margin: 0 auto;
 }
 
 .banner-grid.single-banner .banner-item {
   padding-bottom: 35%;
-  /* Соотношение сторон для одиночного баннера */
   min-height: 180px;
-  /* Уменьшил минимальную высоту */
   max-height: 350px;
-  /* Уменьшил максимальную высоту */
 }
 
 .single-carousel {
   max-width: 900px;
-  /* Уменьшил максимальную ширину контейнера с 1200px */
   margin-left: auto;
   margin-right: auto;
 }
 
-/* Позиционирование стрелок */
 .carousel-arrow-left {
   left: 2px;
 }
@@ -337,7 +308,6 @@ export default {
   right: 2px;
 }
 
-/* Стрелки для одиночной карусели */
 .single-arrow.carousel-arrow-left {
   left: 10px;
 }
@@ -364,18 +334,14 @@ export default {
   }
 }
 
-/* Контейнер баннера с сохранением соотношения сторон */
 .banner-item {
   position: relative;
   width: 100%;
   padding-bottom: 45%;
-  /* Уменьшил высоту для более компактных пропорций */
   min-height: 160px;
-  /* Уменьшил минимальную высоту */
   overflow: hidden;
 }
 
-/* Содержимое баннера с абсолютным позиционированием */
 .banner-content {
   position: absolute;
   top: 0;
@@ -392,7 +358,6 @@ export default {
   transform: translateY(-5px);
 }
 
-/* Изображение баннера */
 .banner-image {
   position: absolute;
   width: 100%;
@@ -405,14 +370,12 @@ export default {
   transform: scale(1.05);
 }
 
-/* Затемнение поверх изображения */
 .banner-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 70%);
 }
 
-/* Текст баннера */
 .banner-text {
   position: absolute;
   bottom: 0;
@@ -423,20 +386,17 @@ export default {
   z-index: 2;
 }
 
-/* Заголовок баннера */
 .banner-title {
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
 
-/* Описание баннера */
 .banner-description {
   font-size: 0.875rem;
   margin-bottom: 0.75rem;
 }
 
-/* Кнопка баннера */
 .banner-button {
   display: inline-block;
   background-color: rgb(79, 70, 229);
@@ -454,7 +414,6 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Адаптивные стили */
 @media (max-width: 1024px) {
   .banner-grid {
     gap: 12px;
@@ -474,12 +433,10 @@ export default {
 
   .banner-item {
     min-height: 140px;
-    /* Уменьшил для больших экранов */
   }
 
   .banner-grid.single-banner {
     max-width: 700px;
-    /* Уменьшил для больших экранов */
   }
 
   .single-carousel {
@@ -495,12 +452,10 @@ export default {
 
   .banner-item {
     min-height: 120px;
-    /* Уменьшил еще больше */
   }
 
   .banner-grid.single-banner {
     max-width: 600px;
-    /* Уменьшил для средних экранов */
   }
 
   .banner-grid.single-banner .banner-item {
@@ -525,12 +480,10 @@ export default {
 
   .banner-item {
     min-height: 100px;
-    /* Уменьшил для маленьких экранов */
   }
 
   .banner-grid.single-banner {
     max-width: 90%;
-    /* Используем процентное значение для малых экранов */
   }
 
   .banner-grid.single-banner .banner-item {
@@ -539,7 +492,6 @@ export default {
   }
 }
 
-/* Самые маленькие экраны */
 @media (max-width: 480px) {
   .banner-text {
     padding: 0.5rem;
@@ -567,7 +519,6 @@ export default {
   .banner-grid.single-banner .banner-item {
     min-height: 120px;
     padding-bottom: 65%;
-    /* Немного увеличиваем для лучшего просмотра на телефонах */
   }
 
   .banner-grid.single-banner {

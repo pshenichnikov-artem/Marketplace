@@ -17,9 +17,7 @@
                 </button>
             </template>
 
-            <!-- Основное содержимое формы редактирования продукта -->
             <div class="space-y-6">
-                <!-- Индикатор загрузки при инициализации редактора -->
                 <div v-if="isLoading" class="flex justify-center items-center py-8">
                     <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
                 </div>
@@ -28,7 +26,6 @@
                 <div v-else class="flex flex-col md:flex-row gap-6">
                     <!-- Левая колонка -->
                     <div class="md:w-7/12 space-y-6">
-                        <!-- 1. Секция основной информации -->
                         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500"
@@ -48,7 +45,6 @@
                                         }" :placeholder="$t('entityEditor.product.namePlaceholder')" ref="nameInput"
                                         @validateInput="updateValidationState('name', $event)" />
 
-                                    <!-- Продавец (недоступен для редактирования) -->
                                     <div v-if="isAdmin">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">
                                             {{ $t('entityEditor.product.seller') }}
@@ -76,7 +72,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Цена и Количество в наличии - в одном ряду -->
+                                    <!-- Цена и Количество в наличии -->
                                     <div class="grid grid-cols-2 gap-4">
                                         <!-- Цена -->
                                         <ValidationInput id="price" :label="$t('entityEditor.product.price')"
@@ -107,7 +103,6 @@
                             </div>
                         </div>
 
-                        <!-- 4. Секция подробного описания -->
                         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500"
@@ -119,7 +114,6 @@
                                 <h3 class="font-semibold text-gray-800">{{ $t('entityEditor.product.details') }}</h3>
                             </div>
                             <div class="p-5">
-                                <!-- Описание товара - заменяем на ValidationInput -->
                                 <ValidationInput id="description" :label="$t('entityEditor.product.description')"
                                     type="textarea" v-model="product.description" validationRules="required"
                                     :error-messages="{
@@ -133,7 +127,6 @@
 
                     <!-- Правая колонка -->
                     <div class="md:w-5/12">
-                        <!-- 3. Секция изображений -->
                         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500"
@@ -205,7 +198,6 @@
                             </div>
                         </div>
 
-                        <!-- Карточка с предпросмотром продукта -->
                         <div class="mt-6 bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500"
@@ -218,7 +210,6 @@
                             </div>
                             <div class="p-5">
                                 <div class="border rounded-lg shadow-sm overflow-hidden">
-                                    <!-- Превью изображения -->
                                     <div
                                         class="aspect-w-16 aspect-h-9 bg-gray-100 flex items-center justify-center overflow-hidden">
                                         <img v-if="product.images && product.images.length > 0" :src="getPreviewImage()"
@@ -232,7 +223,6 @@
                                             <span class="text-sm mt-2">{{ $t('entityEditor.product.noImage') }}</span>
                                         </div>
                                     </div>
-                                    <!-- Информация о продукте -->
                                     <div class="p-4 bg-white">
                                         <h4 class="font-medium text-gray-900 truncate">
                                             {{ product.name || $t('entityEditor.product.namePlaceholder') }}
@@ -257,13 +247,11 @@
             </div>
         </EntityEditor>
 
-        <!-- Модальное окно подтверждения удаления -->
         <ConfirmModal v-if="showDeleteModal" :title="$t('entityEditor.product.deleteConfirm')"
             :message="$t('entityEditor.product.deleteConfirmText')"
             :confirm-text="$t('entityEditor.product.deleteConfirmButton')"
             :cancel-text="$t('entityEditor.product.deleteCancel')" @confirm="deleteProduct" @cancel="cancelDelete" />
 
-        <!-- Уведомления -->
         <Notification ref="toast" />
     </div>
 </template>
@@ -291,7 +279,7 @@ export default {
         ConfirmModal,
         Notification,
         FilterFieldWithDropdown,
-        ValidationInput // Добавляем компонент в список
+        ValidationInput
     },
     props: {
         id: {
@@ -308,21 +296,17 @@ export default {
         const toast = ref(null);
         const fileInput = ref(null);
 
-        // Рефы для ValidationInput
         const nameInput = ref(null);
         const priceInput = ref(null);
         const stockQuantityInput = ref(null);
         const descriptionInput = ref(null);
 
-        // Состояния
         const isLoading = ref(false);
         const isSaving = ref(false);
         const isDragging = ref(false);
         const showDeleteModal = ref(false);
         const isAdmin = computed(() => getUserRole() === 'admin');
-        const sellerName = ref('Текущий продавец'); // Заглушка, будет заменена реальными данными
-
-        // Данные продукта
+        const sellerName = ref('Текущий продавец');
         const product = reactive({
             id: null,
             name: '',
@@ -332,16 +316,13 @@ export default {
             categoryId: '',
             sellerId: null,
             images: [],
-            deletedImageUrls: [] // Для хранения URL удаленных изображений
+            deletedImageUrls: []
         });
 
-        // Категории
         const categories = ref([]);
 
-        // Режим (создание или редактирование)
         const isEditMode = computed(() => !!props.id);
 
-        // Валидация
         const validationState = reactive({
             name: false,
             categoryId: false,
@@ -358,19 +339,16 @@ export default {
             description: ''
         });
 
-        // Метод для обновления состояния валидации
         const updateValidationState = (field, isValid) => {
             validationState[field] = isValid;
         };
 
-        // API хуки
         const { loading: loadingProduct, execute: executeLoadProduct } = useApiRequest();
         const { loading: loadingCategories, execute: executeLoadCategories } = useApiRequest();
         const { loading: loadingSeller, execute: executeLoadSeller } = useApiRequest();
         const { loading: savingProduct, execute: executeSaveProduct } = useApiRequest();
         const { loading: deletingProduct, execute: executeDeleteProduct } = useApiRequest();
 
-        // Отслеживание состояния загрузки
         watch([loadingProduct, loadingCategories, loadingSeller], ([isLoadingProduct, isLoadingCategories, isLoadingSeller]) => {
             isLoading.value = isLoadingProduct || isLoadingCategories || isLoadingSeller;
         });
@@ -379,12 +357,10 @@ export default {
             isSaving.value = isSavingProduct;
         });
 
-        // Преобразование категорий в формат для выпадающего списка
         const categoryOptions = computed(() => {
             return prepareCategoryOptions(categories.value);
         });
 
-        // Загрузка данных продукта при редактировании
         const loadProduct = async () => {
             if (!props.id) return;
 
@@ -393,7 +369,6 @@ export default {
             }, {
                 onSuccess: (data) => {
                     if (data) {
-                        // Заполняем поля формы данными загруженного продукта
                         product.id = data.id;
                         product.name = data.name;
                         product.description = data.description;
@@ -409,17 +384,15 @@ export default {
                             sellerName.value = 'Неизвестный продавец';
                         }
 
-                        // Обработка изображений
                         if (data.images && data.images.length > 0) {
                             product.images = data.images.map((img, idx) => ({
                                 id: img.id,
                                 url: img.url,
                                 isPrimary: img.isPrimary,
-                                isExisting: true // Флаг, что изображение уже существует на сервере
+                                isExisting: true
                             }));
                         }
 
-                        // Запускаем валидацию полей после загрузки данных
                         validateAllFields();
                     }
                 },
@@ -428,7 +401,6 @@ export default {
             });
         };
 
-        // Функция загрузки данных о продавце
         const loadSellerData = async (sellerId) => {
             await executeLoadSeller(async () => {
                 return await userService.getUserById(sellerId);
@@ -447,7 +419,6 @@ export default {
             });
         };
 
-        // Загрузка категорий
         const loadCategories = async () => {
             await executeLoadCategories(async () => {
                 return await categoryService.getAll();
@@ -460,7 +431,6 @@ export default {
             });
         };
 
-        // Валидация полей формы
         const validateField = (field) => {
             switch (field) {
                 case 'name':
@@ -503,19 +473,17 @@ export default {
             }
         };
 
-        // Валидация всех полей
         const validateAllFields = () => {
             nameInput.value?.validate();
             priceInput.value?.validate();
             stockQuantityInput.value?.validate();
             descriptionInput.value?.validate();
-            validateField('categoryId'); // Для поля категории используем отдельную валидацию
+            validateField('categoryId');
         };
 
         const validateForm = () => {
             validateAllFields();
 
-            // Собираем все ошибки валидации
             const errorMessages = [];
 
             if (!validationState.name) {
@@ -546,7 +514,6 @@ export default {
                 errorMessages.push(t('entityEditor.product.validation.descriptionRequired'));
             }
 
-            // Если есть ошибки, отображаем их через Notification
             if (errorMessages.length > 0) {
                 errorMessages.forEach(message => {
                     toast.value.error(message);
@@ -557,7 +524,6 @@ export default {
             return true;
         };
 
-        // Методы для работы с изображениями
         const triggerFileInput = () => {
             fileInput.value.click();
         };
@@ -574,17 +540,16 @@ export default {
         };
 
         const uploadImages = (files) => {
-            // Здесь обрабатываем файлы для загрузки
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         product.images.push({
-                            file: file, // Сохраняем файл для дальнейшей загрузки
-                            url: e.target.result, // URL для отображения
-                            isPrimary: product.images.length === 0, // Первое изображение по умолчанию основное
-                            isExisting: false // Это новое изображение
+                            file: file,
+                            url: e.target.result,
+                            isPrimary: product.images.length === 0,
+                            isExisting: false
                         });
                     };
                     reader.readAsDataURL(file);
@@ -600,15 +565,12 @@ export default {
             const image = product.images[index];
             const wasMain = image.isPrimary;
 
-            // Если это существующее изображение, добавляем его URL в список удаленных
             if (image.isExisting && image.url) {
                 product.deletedImageUrls.push(image.url);
             }
 
-            // Удаляем изображение из массива
             product.images.splice(index, 1);
 
-            // Если удалили основное изображение и есть другие, делаем первое основным
             if (wasMain && product.images.length > 0) {
                 product.images[0].isPrimary = true;
             }
@@ -619,7 +581,6 @@ export default {
         };
 
         const setPrimaryImage = (index) => {
-            // Сначала снимаем флаг со всех изображений
             product.images.forEach(img => {
                 img.isPrimary = false;
             });
@@ -628,27 +589,21 @@ export default {
             product.images[index].isPrimary = true;
         };
 
-        // Метод для получения превью изображения
         const getPreviewImage = () => {
             if (!product.images || product.images.length === 0) return '';
 
-            // Ищем основное изображение
             const primaryImage = product.images.find(img => img.isPrimary);
             if (primaryImage) return primaryImage.url;
 
-            // Если основное не найдено, возвращаем первое
             return product.images[0].url;
         };
 
-        // Методы для управления продуктом
         const saveProduct = async () => {
-            // Валидируем форму
             if (!validateForm()) {
                 toast.value.error(t('entityEditor.product.validation.formErrors'));
                 return;
             }
 
-            // Подготавливаем данные для отправки по формату ProductCreateRequest
             const formData =
             {
                 name: product.name,
@@ -656,7 +611,7 @@ export default {
                 price: product.price,
                 stockQuantity: product.stockQuantity,
                 categoryId: product.categoryId,
-                sellerId: product.sellerId || 1, // Если sellerId не указан, используем 1
+                sellerId: product.sellerId || 1,
                 photos: [],
                 oldPhotos: [],
                 primaryPhotoIndex: 0
@@ -665,9 +620,8 @@ export default {
             formData.description = product.description;
             formData.price = product.price;
             formData.stockQuantity = product.stockQuantity;
-            formData.categoryId = product.categoryId; // Если sellerId не указан, используем 1
+            formData.categoryId = product.categoryId;
 
-            // Добавляем sellerId, если он есть
             if (product.sellerId) {
                 formData.sellerId = product.sellerId;
             }
@@ -675,24 +629,20 @@ export default {
                 formData.sellerId = 1;
             }
 
-            // Добавляем новые файлы изображений
             const newImages = product.images.filter(img => !img.isExisting && img.file);
             newImages.forEach(img => {
                 formData.photos.push(img.file);
             });
 
-            // Добавляем список существующих изображений, которые нужно сохранить
             const existingImages = product.images.filter(img => img.isExisting && img.url);
             existingImages.forEach(img => {
                 formData.oldPhotos.push(img.url);
             });
 
-            // Определяем индекс основного изображения
             const allImages = [...newImages, ...existingImages];
             const primaryIndex = allImages.findIndex(img => img.isPrimary);
             formData.primaryPhotoIndex = primaryIndex >= 0 ? primaryIndex : 0;
 
-            // Если редактируем существующий продукт
             if (isEditMode.value) {
                 formData.id = product.id;
             }
@@ -739,19 +689,15 @@ export default {
             showDeleteModal.value = false;
         };
 
-        // Обработчик выбора категории
         const onCategorySelected = (option) => {
             product.categoryId = option.value || option.id;
             validateField('categoryId');
             validationState.categoryId = !!product.categoryId;
         };
 
-        // Инициализация
         onMounted(async () => {
-            // Загружаем категории
             await loadCategories();
 
-            // Если это режим редактирования, загружаем данные продукта
             if (isEditMode.value) {
                 await loadProduct();
             }
@@ -814,7 +760,6 @@ export default {
     }
 }
 
-/* Стили для аспектного соотношения превью */
 .aspect-w-16 {
     position: relative;
     padding-bottom: 56.25%;
@@ -830,7 +775,6 @@ export default {
     left: 0;
 }
 
-/* Плавные переходы для элементов интерфейса */
 .bg-white,
 .rounded-lg,
 .border {

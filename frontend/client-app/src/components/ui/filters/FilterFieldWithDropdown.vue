@@ -1,7 +1,6 @@
 <template>
     <div class="w-full relative group">
         <label v-if="label" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-            <!-- Иконка (если предоставлена) -->
             <slot name="icon">
                 <svg v-if="icon === 'category'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,7 +81,6 @@ export default {
         const searchQuery = ref('');
         const dropdownRef = ref(null);
 
-        // Вычисляем текст выбранного элемента
         const selectedLabel = computed(() => {
             if (!props.modelValue) return props.placeholder || 'Select...';
 

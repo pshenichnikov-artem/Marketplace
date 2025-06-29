@@ -1,6 +1,5 @@
 <template>
     <div class="space-y-6">
-        <!-- Компонент AdminPanel для управления отзывами -->
         <AdminPanel :title="$t('dashboard.reviews.title')" :columns="columns" :items="reviews.items"
             :total-items="reviews.totalItems" :current-page="currentPage" :page-size="pageSize"
             :no-data-text="$t('dashboard.reviews.noReviews')"
@@ -32,7 +31,6 @@
                 </div>
             </template>
 
-            <!-- Кастомные слоты для ячеек таблицы -->
             <template #cell-rating="{ value }">
                 <div class="flex items-center">
                     <div class="flex items-center">
@@ -61,7 +59,6 @@
             :cancel-text="$t('dashboard.reviews.cancelDelete')" @confirm="deleteReview"
             @cancel="showDeleteModal = false" />
 
-        <!-- Уведомления -->
         <Notification ref="toast" />
 
         <!-- Модальное окно просмотра/редактирования отзыва -->
@@ -143,21 +140,18 @@ export default {
         const { t, locale } = useI18n();
         const toast = ref(null);
 
-        // Состояние таблицы
         const reviews = ref({ items: [], totalItems: 0 });
-        const currentPage = ref(0); // API использует нумерацию с 0
+        const currentPage = ref(0);
         const pageSize = ref(20);
         const sortBy = ref('createdAt');
         const sortDirection = ref('desc');
 
-        // Фильтры
         const filters = reactive({
             search: '',
             userId: '',
             productId: ''
         });
 
-        // Определение колонок таблицы
         const columns = computed(() => [
             { key: 'id', label: 'ID', width: 'w-16' },
             { key: 'productId', label: t('dashboard.reviews.columns.product'), width: 'w-24' },
@@ -167,12 +161,10 @@ export default {
             { key: 'createdAt', label: t('dashboard.reviews.columns.date'), width: 'w-44' }
         ]);
 
-        // Сортировка
         const sortKey = ref('createdAt');
         const sortOrder = ref('desc');
         const sortOption = ref('createdAt_desc');
 
-        // Опции для сортировки
         const sortOptions = [
             { label: t('dashboard.reviews.filters.sortOptions.dateDesc'), value: 'createdAt_desc' },
             { label: t('dashboard.reviews.filters.sortOptions.dateAsc'), value: 'createdAt_asc' },
@@ -180,7 +172,6 @@ export default {
             { label: t('dashboard.reviews.filters.sortOptions.ratingAsc'), value: 'rating_asc' }
         ];
 
-        // Методы для модального окна редактирования
         const openReviewDetails = (review) => {
             selectedReview.value = { ...review };
             showReviewModal.value = true;
@@ -197,7 +188,6 @@ export default {
             closeReviewModal();
         };
 
-        // Удаление отзыва
         const confirmDeleteReview = (review) => {
             reviewToDelete.value = review;
             showDeleteModal.value = true;
@@ -221,11 +211,9 @@ export default {
             reviewToDelete.value = null;
         };
 
-        // API хуки
         const { loading: reviewsLoading, execute: executeReviewsFetch } = useApiRequest();
         const { loading: deleteLoading, execute: executeDelete } = useApiRequest();
 
-        // Загрузка списка отзывов
         const fetchReviews = async () => {
             await executeReviewsFetch(async () => {
                 return await reviewService.getReviews(
@@ -251,19 +239,16 @@ export default {
             });
         };
 
-        // Функция инициализации данных
         const initializeData = () => {
             fetchReviews();
         };
 
-        // Загрузка данных при монтировании компонента
         onMounted(() => {
             initializeData();
         });
 
-        // Обработчики событий
         const applyFilters = () => {
-            currentPage.value = 0; // Сбрасываем страницу при применении фильтров
+            currentPage.value = 0;
             fetchReviews();
         };
 
@@ -276,12 +261,11 @@ export default {
         };
 
         const handlePaginationChange = (event) => {
-            currentPage.value = event.page; // Адаптируем к API, которое использует нумерацию с 0
+            currentPage.value = event.page;
             pageSize.value = event.pageSize;
             fetchReviews();
         };
 
-        // Обработчик изменения сортировки
         const handleSortChange = () => {
             if (sortOption.value) {
                 const [key, order] = sortOption.value.split('_');
@@ -291,7 +275,6 @@ export default {
             }
         };
 
-        // Форматирование даты
         const formatDate = (dateString) => {
             if (!dateString) return '';
             const date = new Date(dateString);
@@ -304,7 +287,6 @@ export default {
             }).format(date);
         };
 
-        // Добавляем отсутствующие состояния для модальных окон
         const showDeleteModal = ref(false);
         const showReviewModal = ref(false);
         const reviewToDelete = ref(null);
@@ -316,7 +298,7 @@ export default {
             currentPage,
             pageSize,
             filters,
-            showDeleteModal, // Добавляем в возвращаемый объект
+            showDeleteModal,
             showReviewModal,
             reviewToDelete,
             selectedReview,
@@ -340,7 +322,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-/* Дополнительные стили при необходимости */
-</style>

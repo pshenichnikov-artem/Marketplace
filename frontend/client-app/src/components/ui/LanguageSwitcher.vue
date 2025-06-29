@@ -1,6 +1,5 @@
 <template>
   <div class="flex items-center gap-4">
-    <!-- Текст En -->
     <span class="text-lg font-medium cursor-pointer hover:text-indigo-700"
       :class="{ 'text-indigo-600 font-bold': currentLanguage === 'en', 'text-gray-500': currentLanguage !== 'en' }"
       @click="setLanguage('en')">
@@ -9,12 +8,10 @@
 
     <div class="relative w-16 h-8 bg-gray-200 rounded-full flex items-center px-1 cursor-pointer"
       @click="toggleLanguage">
-      <!-- Ползунок -->
       <div class="w-6 h-6 absolute bg-indigo-600 rounded-full shadow-md transition-all duration-300"
         :style="{ left: currentLanguage === 'en' ? '6px' : 'calc(100% - 6px - 24px)' }"></div>
     </div>
 
-    <!-- Текст Ru -->
     <span class="text-lg font-medium cursor-pointer hover:text-indigo-700"
       :class="{ 'text-indigo-600 font-bold': currentLanguage === 'ru', 'text-gray-500': currentLanguage !== 'ru' }"
       @click="setLanguage('ru')">
@@ -38,7 +35,6 @@ function toggleLanguage() {
 }
 
 function setLanguage(lang) {
-  // Используем функцию из i18n.ts, которая также сохраняет язык в localStorage
   setLocale(lang);
 }
 </script>

@@ -1,9 +1,7 @@
 <template>
     <div class="max-w-5xl mx-auto">
-        <!-- Используем общий компонент EntityEditor в качестве оболочки -->
         <EntityEditor :title="isEditMode ? $t('dashboard.categories.edit') : $t('dashboard.categories.create')"
             :is-saving="isSaving" :back-link="'/dashboard/categories'" @back="handleBack" @save="saveCategory">
-            <!-- Дополнительные действия в шапке -->
             <template v-if="isEditMode" #actions>
                 <button @click="confirmDelete"
                     class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center shadow-sm hover:shadow-md">
@@ -16,9 +14,7 @@
                 </button>
             </template>
 
-            <!-- Основное содержимое формы редактирования категории -->
             <div class="space-y-6">
-                <!-- Индикатор загрузки при инициализации редактора -->
                 <div v-if="isLoading" class="flex justify-center items-center py-8">
                     <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
                 </div>
@@ -69,7 +65,6 @@
             :confirm-text="$t('dashboard.categories.deleteConfirmButton')"
             :cancel-text="$t('dashboard.categories.cancelDelete')" @confirm="deleteCategory" @cancel="cancelDelete" />
 
-        <!-- Уведомления -->
         <Notification ref="toast" />
     </div>
 </template>
@@ -111,28 +106,21 @@ export default {
         const toast = ref(null);
         const categoryNameInput = ref(null);
 
-        // Состояния
         const isLoading = ref(false);
         const isSaving = ref(false);
         const showDeleteModal = ref(false);
 
-        // Данные категории
         const category = reactive({
             id: null,
             categoryName: '',
             parentCategoryId: null
         });
 
-        // Список всех категорий для выбора родительской категории
         const categories = ref([]);
 
-        // Режим (создание или редактирование)
         const isEditMode = computed(() => !!props.id);
 
-        // Преобразование категорий в формат для выпадающего списка
         const categoryOptions = computed(() => {
-            // Фильтруем список, чтобы исключить текущую категорию и ее подкатегории
-            // это предотвратит создание циклических зависимостей
             const filteredCategories = isEditMode.value
                 ? filterCategoriesForEdit(categories.value, parseInt(props.id))
                 : [...categories.value];
@@ -140,19 +128,16 @@ export default {
             return prepareCategoryOptions(filteredCategories, t('dashboard.categories.noParentCategory'));
         });
 
-        // Функция для фильтрации категорий при редактировании
         function filterCategoriesForEdit(categories, currentId) {
             const result = [];
 
             for (const cat of categories) {
-                // Пропускаем текущую категорию и все ее подкатегории
                 if (cat.id === currentId) {
                     continue;
                 }
 
                 const newCat = { ...cat };
 
-                // Рекурсивно фильтруем подкатегории
                 if (cat.subCategories && cat.subCategories.length > 0) {
                     newCat.subCategories = filterCategoriesForEdit(cat.subCategories, currentId);
                 }
@@ -163,7 +148,6 @@ export default {
             return result;
         }
 
-        // Валидация
         const validationState = reactive({
             categoryName: false
         });
@@ -172,24 +156,20 @@ export default {
             categoryName: ''
         });
 
-        // Метод для обновления состояния валидации
         const updateValidationState = (field, isValid) => {
             validationState[field] = isValid;
         };
 
-        // API хуки
         const { loading: loadingCategory, execute: executeLoadCategory } = useApiRequest();
         const { loading: loadingCategories, execute: executeLoadCategories } = useApiRequest();
         const { loading: savingCategory, execute: executeSaveCategory } = useApiRequest();
         const { loading: deletingCategory, execute: executeDeleteCategory } = useApiRequest();
 
-        // Отслеживание состояния загрузки
         const watchLoading = () => {
             isLoading.value = loadingCategory.value || loadingCategories.value;
             isSaving.value = savingCategory.value;
         };
 
-        // Загрузка категорий
         const loadCategories = async () => {
             await executeLoadCategories(async () => {
                 return await categoryService.getAll();
@@ -206,7 +186,6 @@ export default {
             watchLoading();
         };
 
-        // Загрузка данных категории при редактировании
         const loadCategory = async () => {
             if (!props.id) return;
 
@@ -219,7 +198,6 @@ export default {
                         category.categoryName = data.categoryName;
                         category.parentCategoryId = data.parentCategoryId;
 
-                        // Запускаем валидацию полей после загрузки данных
                         validateAllFields();
                     }
                 },
@@ -230,7 +208,6 @@ export default {
             watchLoading();
         };
 
-        // Валидация полей формы
         const validateField = (field) => {
             switch (field) {
                 case 'categoryName':
@@ -240,11 +217,9 @@ export default {
                     break;
             }
 
-            // Обновляем состояние валидации
             validationState[field] = !errors[field];
         };
 
-        // Валидация всех полей
         const validateAllFields = () => {
             categoryNameInput.value?.validate();
         };
@@ -252,23 +227,18 @@ export default {
         const validateForm = () => {
             validateAllFields();
 
-            // Проверяем валидность формы
             return validationState.categoryName;
         };
 
-        // Обработчик выбора категории
         const onCategorySelected = (option) => {
             category.parentCategoryId = option.value || option.id || null;
         };
 
-        // Методы для управления категорией
         const saveCategory = async () => {
-            // Валидируем форму
             if (!validateForm()) {
                 return;
             }
 
-            // Создаем запрос
             const categoryRequest = {
                 categoryName: category.categoryName,
                 parentCategoryId: category.parentCategoryId
@@ -324,12 +294,9 @@ export default {
             router.push('/dashboard/categories');
         };
 
-        // Инициализация
         onMounted(async () => {
-            // Загружаем список категорий
             await loadCategories();
 
-            // Если это режим редактирования, загружаем данные категории
             if (isEditMode.value) {
                 await loadCategory();
             }

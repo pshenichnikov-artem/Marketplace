@@ -7,40 +7,31 @@
       </select>
     </div>
 
-    <!-- Новый макет пагинации с номерами страниц -->
     <div class="flex-1 flex items-center justify-center">
       <div class="flex items-center gap-2">
-        <!-- Кнопка "Назад" -->
         <button v-if="internalCurrentPage > 1" @click="changePage(internalCurrentPage - 1)"
           class="px-3 py-2 border rounded font-semibold text-base bg-white hover:bg-gray-100 transition">
           {{ $t('basePagination.prev') }}
         </button>
 
-        <!-- Номера страниц -->
         <div class="flex items-center">
-          <!-- Первая страница всегда видна -->
           <button @click="changePage(1)" :class="getPageButtonClass(1)">
             1
           </button>
 
-          <!-- Многоточие в начале, если текущая страница далеко от начала -->
           <span v-if="startPage > 2" class="px-3 py-2">...</span>
 
-          <!-- Отображаем номера страниц вокруг текущей -->
           <button v-for="page in visiblePages" :key="page" @click="changePage(page)" :class="getPageButtonClass(page)">
             {{ page }}
           </button>
 
-          <!-- Многоточие в конце, если текущая страница далеко от конца -->
           <span v-if="endPage < totalPages - 1" class="px-3 py-2">...</span>
 
-          <!-- Последняя страница всегда видна, если страниц больше одной -->
           <button v-if="totalPages > 1" @click="changePage(totalPages)" :class="getPageButtonClass(totalPages)">
             {{ totalPages }}
           </button>
         </div>
 
-        <!-- Кнопка "Вперёд" -->
         <button v-if="internalCurrentPage < totalPages" @click="changePage(internalCurrentPage + 1)"
           class="px-3 py-2 border rounded font-semibold text-base bg-white hover:bg-gray-100 transition">
           {{ $t('basePagination.next') }}
@@ -85,7 +76,6 @@ export default {
     totalPages() {
       return Math.max(1, Math.ceil(this.totalItems / this.internalPageSize));
     },
-    // Вычисляем видимые страницы вокруг текущей
     startPage() {
       if (this.internalCurrentPage <= Math.ceil(this.maxVisiblePages / 2)) {
         return 2;

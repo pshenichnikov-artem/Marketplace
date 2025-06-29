@@ -2,27 +2,15 @@
   <div class="mb-4">
     <label v-if="label" class="block text-sm font-medium text-gray-700">{{ label }}</label>
     <div class="relative flex items-center">
-      <input
-          class="w-full border rounded px-3 py-2 mt-1 text-sm focus:outline-none focus:ring-2 pr-10"
-          :class="{
-          'border-gray-300 focus:ring-blue-500': !error && !isValid,
-          'border-green-500 focus:ring-green-500': isValid,
-          'border-red-500 focus:ring-red-500': error,
-        }"
-          :id="id"
-          :type="computedInputType"
-          :placeholder="placeholder"
-          :value="modelValue"
-          @input="handleInput"
-          @blur="validate"
-      />
-      <!-- Глазик -->
-      <button
-          v-if="type === 'password'"
-          type="button"
-          class="absolute inset-y-0 right-2 text-gray-500 text-sm flex items-center justify-center"
-          @click="togglePasswordVisibility"
-      >
+      <input class="w-full border rounded px-3 py-2 mt-1 text-sm focus:outline-none focus:ring-2 pr-10" :class="{
+        'border-gray-300 focus:ring-blue-500': !error && !isValid,
+        'border-green-500 focus:ring-green-500': isValid,
+        'border-red-500 focus:ring-red-500': error,
+      }" :id="id" :type="computedInputType" :placeholder="placeholder" :value="modelValue" @input="handleInput"
+        @blur="validate" />
+      <button v-if="type === 'password'" type="button"
+        class="absolute inset-y-0 right-2 text-gray-500 text-sm flex items-center justify-center"
+        @click="togglePasswordVisibility">
         <img :src="showPassword ? '/images/open_eye.png' : 'images/close_eye.png'" alt="eye icon" class="w-6 h-6" />
       </button>
     </div>
@@ -81,17 +69,14 @@ const computedInputType = computed(() => {
   return showPassword.value ? 'text' : 'password';
 });
 
-// Вычисляемое свойство, которое возвращает текущий статус валидации
 const isValidated = computed(() => {
   return isValid.value && !error.value;
 });
 
-// Кастомные паттерны
 const customPatterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone: /^\+?[0-9]{10,15}$/,
 
-  // Имя и фамилия — одна раскладка, первая буква заглавная, остальные маленькие, длина 3–50
   name: /^(?:[A-Z][a-z]{2,49}|[А-ЯЁ][а-яё]{2,49})$/,
   lastName: /^(?:[A-Z][a-z]{2,49}|[А-ЯЁ][а-яё]{2,49})$/,
 
@@ -155,8 +140,7 @@ function getValidators() {
 function validate() {
   error.value = null;
   isValid.value = false;
-  
-  // Если значение пустое и нет правила required, считаем валидным
+
   if (!props.modelValue) {
     const rules = parseRules(props.validationRules);
     if (!rules.some(r => r.name === 'required')) {
@@ -166,7 +150,7 @@ function validate() {
       return true;
     }
   }
-  
+
   const rules = parseRules(props.validationRules);
   const validators = getValidators();
 
@@ -175,7 +159,6 @@ function validate() {
     if (validator) {
       const result = validator(props.modelValue, param);
       if (result !== true) {
-        // Используем переданные сообщения об ошибках или берем из локализации
         error.value = result;
         emit('update:validationErrors', { [props.id]: error.value });
         emit('validateInput', false);
@@ -197,7 +180,6 @@ function handleInput(e) {
   validate();
 }
 
-// Экспортируем метод validate для использования извне
 defineExpose({
   validate,
   isValidated

@@ -23,7 +23,6 @@
                     <div v-for="review in reviews" :key="review.id"
                         class="bg-gray-50 rounded-lg p-5 hover:shadow-md transition-shadow duration-300 border border-gray-100">
                         <div class="flex items-start">
-                            <!-- Аватар пользователя (заглушка) -->
                             <div
                                 class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-lg font-bold mr-4 flex-shrink-0">
                                 {{ review.firstName.charAt(0) }}{{ review.lastName.charAt(0) }}
@@ -62,7 +61,6 @@
                 </div>
             </template>
 
-            <!-- Кастомное представление для пустого состояния -->
             <template #empty>
                 <div class="text-center py-12 px-4">
                     <div
@@ -82,7 +80,6 @@
             </template>
         </StateWrapper>
 
-        <!-- Компонент уведомлений -->
         <Notification ref="toast" />
     </div>
 </template>
@@ -112,10 +109,8 @@ export default {
         const reviews = ref([]);
         const toast = ref(null);
 
-        // API хук для загрузки отзывов
         const { loading, error, execute } = useApiRequest();
 
-        // Загрузка отзывов
         const fetchReviews = async () => {
             await execute(async () => {
                 return await reviewService.getReviews(props.productId);
@@ -128,7 +123,6 @@ export default {
             });
         };
 
-        // Форматирование даты
         const formatDate = (dateString) => {
             const date = new Date(dateString);
             return new Intl.DateTimeFormat('ru-RU', {
@@ -140,7 +134,6 @@ export default {
             }).format(date);
         };
 
-        // Загружаем отзывы при монтировании компонента
         onMounted(() => {
             fetchReviews();
         });
@@ -157,7 +150,6 @@ export default {
 </script>
 
 <style scoped>
-/* Анимация появления отзывов */
 .space-y-6>div {
     animation: fadeIn 0.5s ease-out;
     animation-fill-mode: both;

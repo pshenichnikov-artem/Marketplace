@@ -34,10 +34,8 @@
             </div>
         </div>
 
-        <!-- Form -->
         <div class="bg-white rounded-lg shadow p-6">
             <div class="space-y-6">
-                <!-- Page key field -->
                 <div>
                     <label for="pageKey" class="block text-sm font-medium text-gray-700 mb-1">
                         {{ $t('dashboard.pages.pageKey') }} <span class="text-red-500">*</span>
@@ -49,7 +47,6 @@
                     <p v-if="errors.pageKey" class="mt-1 text-sm text-red-500">{{ errors.pageKey }}</p>
                 </div>
 
-                <!-- Language selector - только для новых страниц -->
                 <div v-if="!isEditMode">
                     <label for="language" class="block text-sm font-medium text-gray-700 mb-1">
                         {{ $t('dashboard.pages.language') }} <span class="text-red-500">*</span>
@@ -61,7 +58,6 @@
                     </select>
                 </div>
 
-                <!-- Выбор языка для редактируемой страницы (только информация) -->
                 <div v-else class="flex items-center">
                     <label class="block text-sm font-medium text-gray-700 mr-2">
                         {{ $t('dashboard.pages.language') }}:
@@ -71,7 +67,6 @@
                     </span>
                 </div>
 
-                <!-- Editor mode toggle -->
                 <div class="flex items-center justify-between">
                     <label class="block text-sm font-medium text-gray-700">
                         {{ $t('dashboard.pages.content') }} <span class="text-red-500">*</span>
@@ -89,14 +84,12 @@
                     </div>
                 </div>
 
-                <!-- Content Editor Component -->
                 <ContentEditor v-model:value="htmlContent" v-model:mode="editorMode" :toast="toast" />
 
                 <p v-if="errors.content" class="mt-1 text-sm text-red-500">{{ errors.content }}</p>
             </div>
         </div>
 
-        <!-- Notification component -->
         <Notification ref="toast" />
     </div>
 </template>

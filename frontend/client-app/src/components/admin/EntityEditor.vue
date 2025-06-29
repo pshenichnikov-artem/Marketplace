@@ -42,7 +42,6 @@
 
         <!-- Основное содержимое -->
         <div class="p-6">
-            <!-- Обертка для контента с поддержкой горизонтального скроллинга для таблиц -->
             <div class="overflow-hidden">
                 <slot></slot>
             </div>
@@ -96,7 +95,6 @@ export default {
 
         };
 
-        // Предотвращаем действие браузерной кнопки "Назад", если нужно
         const handlePopState = (event) => {
             if (event.state !== null) {
                 emit('back');
@@ -134,7 +132,6 @@ export default {
     }
 }
 
-/* Стили для поддержки скроллинга таблиц */
 :deep(table) {
     width: 100%;
     min-width: 100%;
@@ -148,7 +145,6 @@ export default {
     margin-bottom: 1rem;
 }
 
-/* Обеспечиваем корректное поведение при горизонтальном скроллинге */
 :deep(th),
 :deep(td) {
     white-space: nowrap;
@@ -156,14 +152,13 @@ export default {
     text-overflow: ellipsis;
 }
 
-/* Фиксированная ширина для колонок с действиями */
 :deep(th.actions-column),
 :deep(td.actions-column) {
     width: 160px;
     min-width: 160px;
 }
 
-/* Дополнительные стили для улучшения отображения длинного текста */
+
 :deep(td.expandable-cell) {
     max-width: 300px;
     white-space: normal;

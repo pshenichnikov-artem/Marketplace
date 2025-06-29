@@ -1,12 +1,11 @@
 <template>
     <MainNavbar />
     <div class="page-container">
-        <!-- Загрузка -->
+
         <div v-if="isLoading" class="flex justify-center items-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
         </div>
 
-        <!-- Ошибка 404 -->
         <div v-else-if="notFound" class="py-20 text-center">
             <div class="max-w-lg mx-auto">
                 <h1 class="text-6xl font-bold text-indigo-600 mb-6">404</h1>
@@ -48,7 +47,7 @@ export default {
         AppFooter
     },
     setup() {
-        const { t, locale } = useI18n(); // Получаем текущую локаль
+        const { t, locale } = useI18n();
         const route = useRoute();
         const router = useRouter();
 
@@ -56,12 +55,9 @@ export default {
         const notFound = ref(false);
         const { loading: isLoading, execute } = useApiRequest();
 
-        // Получаем ключ страницы из URL
         const getPageKeyFromUrl = () => {
-            // Берем текущий путь и убираем первый слэш
             let pageKey = route.path.substring(1);
 
-            // Если путь пустой, используем главную страницу
             if (!pageKey) {
                 pageKey = 'home';
             }
@@ -69,18 +65,15 @@ export default {
             return pageKey;
         };
 
-        // Очистка HTML для защиты от XSS
         const sanitizedContent = computed(() => {
             return DOMPurify.sanitize(pageContent.value);
         });
 
-        // Загружаем страницу с учетом текущей локали
         const loadPage = async () => {
             const pageKey = getPageKeyFromUrl();
-            const currentLocale = locale.value; // Получаем текущую локаль
+            const currentLocale = locale.value;
 
             await execute(async () => {
-                // Передаем текущую локаль в запрос
                 return await pageService.getPageByKey(pageKey, currentLocale);
             }, {
                 onSuccess: (data) => {
@@ -88,7 +81,6 @@ export default {
                         pageContent.value = data.content;
                         notFound.value = false;
 
-                        // Устанавливаем заголовок страницы
                         document.title = `${pageKey.charAt(0).toUpperCase() + pageKey.slice(1)} | Your App Name`;
                     } else {
                         notFound.value = true;
@@ -102,7 +94,6 @@ export default {
             });
         };
 
-        // Добавим обработку изменения локали для перезагрузки контента
         watch(locale, () => {
             loadPage();
         });
@@ -127,7 +118,6 @@ export default {
     margin: 0 auto;
     padding: 2rem;
     min-height: calc(100vh - 64px);
-    /* Вычитаем высоту навигационной панели */
     display: flex;
     flex-direction: column;
 }
@@ -142,7 +132,6 @@ export default {
 .full-height {
     flex: 1;
     min-height: calc(100vh - 160px);
-    /* Вычитаем высоту навигационной панели и поля */
 }
 
 .page-content :deep(h1) {
@@ -204,7 +193,6 @@ export default {
     color: #4a5568;
 }
 
-/* Анимация загрузки */
 .animate-spin {
     animation: spin 1s linear infinite;
 }

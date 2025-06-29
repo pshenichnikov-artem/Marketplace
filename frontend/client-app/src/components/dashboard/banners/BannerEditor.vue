@@ -33,7 +33,6 @@
                     </div>
 
                     <div class="p-5 space-y-6">
-                        <!-- Если нет баннеров, показываем сообщение -->
                         <div v-if="banners.length === 0"
                             class="text-center py-10 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3"
@@ -45,7 +44,6 @@
                             <p class="text-gray-500 text-sm mt-1">{{ $t('entityEditor.banner.addBannerTip') }}</p>
                         </div>
 
-                        <!-- Список баннеров с возможностью редактирования -->
                         <div v-for="(banner, index) in banners" :key="index"
                             class="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
                             <div
@@ -66,14 +64,12 @@
 
                             <div class="p-4 space-y-4">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <!-- Название баннера -->
                                     <ValidationInput :id="`title-${index}`" :label="$t('entityEditor.banner.title')"
                                         v-model="banner.title" validationRules="required" :error-messages="{
                                             required: $t('entityEditor.banner.validation.titleRequired')
                                         }" :placeholder="$t('entityEditor.banner.titlePlaceholder')"
                                         @validateInput="updateValidationState(`title-${index}`, $event)" />
 
-                                    <!-- URL ссылки -->
                                     <ValidationInput :id="`link-${index}`" :label="$t('entityEditor.banner.link')"
                                         v-model="banner.link" validationRules="required" :error-messages="{
                                             required: $t('entityEditor.banner.validation.linkRequired')
@@ -81,7 +77,6 @@
                                         @validateInput="updateValidationState(`link-${index}`, $event)" />
                                 </div>
 
-                                <!-- Описание баннера -->
                                 <ValidationInput :id="`description-${index}`"
                                     :label="$t('entityEditor.banner.description')" v-model="banner.description"
                                     validationRules="required" :error-messages="{
@@ -89,7 +84,6 @@
                                     }" :placeholder="$t('entityEditor.banner.descriptionPlaceholder')"
                                     @validateInput="updateValidationState(`description-${index}`, $event)" />
 
-                                <!-- Загрузка изображения -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
                                         {{ $t('entityEditor.banner.image') }} <span class="text-red-500">*</span>
@@ -125,7 +119,6 @@
                                     </p>
                                 </div>
 
-                                <!-- Предпросмотр баннера -->
                                 <div v-if="banner.imagePreview" class="mt-4 border rounded-lg overflow-hidden">
                                     <div class="relative aspect-w-16 aspect-h-5 bg-gray-100">
                                         <img :src="banner.imagePreview" class="object-cover w-full h-full"
@@ -149,7 +142,6 @@
             </div>
         </EntityEditor>
 
-        <!-- Уведомления -->
         <Notification ref="toast" />
     </div>
 </template>
@@ -175,34 +167,27 @@ export default {
         const { t } = useI18n();
         const router = useRouter();
 
-        // Refs
         const toast = ref(null);
-        const fileInputs = ref({}); // Объект для хранения ссылок на инпуты файлов
+        const fileInputs = ref({});
 
-        // Состояния
         const isLoading = ref(false);
         const isSaving = ref(false);
         const isSubmitting = ref(false);
         const existingBanners = ref([]);
 
-        // Баннеры для редактирования
         const banners = ref([]);
 
-        // Валидация
         const validationState = reactive({});
         const errors = reactive({});
 
-        // API хуки
         const { loading: loadingBanners, execute: executeLoadBanners } = useApiRequest();
         const { loading: savingBanners, execute: executeSaveBanners } = useApiRequest();
 
-        // Отслеживаем состояние загрузки
         const updateLoading = () => {
             isLoading.value = loadingBanners.value;
             isSaving.value = savingBanners.value;
         };
 
-        // Загрузка существующих баннеров
         const loadBanners = async () => {
             await executeLoadBanners(async () => {
                 return await bannerService.getBanners();
@@ -211,7 +196,6 @@ export default {
                     if (data && data.length > 0) {
                         existingBanners.value = data;
 
-                        // Преобразуем полученные баннеры в формат для редактирования
                         data.forEach(banner => {
                             banners.value.push({
                                 title: banner.title,
@@ -219,24 +203,22 @@ export default {
                                 link: banner.link,
                                 imageUrl: banner.imageUrl,
                                 imagePreview: banner.imageUrl,
-                                image: null // Файл изображения (будет заполнен при выборе нового)
+                                image: NonNullable
                             });
                         });
                     } else {
-                        // Если баннеров нет, добавляем пустой для начала работы
                         addNewBanner();
                     }
                 },
                 onError: () => {
                     toast.value.error(t('entityEditor.banner.loadError'));
-                    // Добавляем пустой баннер для начала работы
+
                     addNewBanner();
                 },
                 finally: updateLoading
             });
         };
 
-        // Добавление нового баннера
         const addNewBanner = () => {
             banners.value.push({
                 title: '',
@@ -247,7 +229,6 @@ export default {
                 image: null
             });
 
-            // Добавляем состояние валидации для нового баннера
             const index = banners.value.length - 1;
             validationState[`title-${index}`] = false;
             validationState[`description-${index}`] = false;
@@ -259,13 +240,11 @@ export default {
         const removeBanner = (index) => {
             banners.value.splice(index, 1);
 
-            // Удаляем состояние валидации для этого баннера
             delete validationState[`title-${index}`];
             delete validationState[`description-${index}`];
             delete validationState[`link-${index}`];
             delete errors[`image-${index}`];
 
-            // Обновляем состояния валидации для оставшихся баннеров
             for (let i = index; i < banners.value.length; i++) {
                 validationState[`title-${i}`] = validationState[`title-${i + 1}`];
                 validationState[`description-${i}`] = validationState[`description-${i + 1}`];
@@ -279,12 +258,10 @@ export default {
             }
         };
 
-        // Обновление состояния валидации
         const updateValidationState = (field, isValid) => {
             validationState[field] = isValid;
         };
 
-        // Работа с изображениями - исправленный метод triggerFileInput
         const triggerFileInput = (index) => {
             if (fileInputs.value[index]) {
                 fileInputs.value[index].click();
@@ -309,10 +286,8 @@ export default {
                 return;
             }
 
-            // Очищаем ошибку
             errors[`image-${index}`] = '';
 
-            // Создаем превью изображения
             const reader = new FileReader();
             reader.onload = (e) => {
                 banners.value[index].imagePreview = e.target.result;
@@ -326,25 +301,21 @@ export default {
             let isValid = true;
 
             banners.value.forEach((banner, index) => {
-                // Проверяем заголовок
                 if (!validationState[`title-${index}`]) {
                     toast.value.error(t('entityEditor.banner.validation.titleRequired'));
                     isValid = false;
                 }
 
-                // Проверяем описание
                 if (!validationState[`description-${index}`]) {
                     toast.value.error(t('entityEditor.banner.validation.descriptionRequired'));
                     isValid = false;
                 }
 
-                // Проверяем ссылку
                 if (!validationState[`link-${index}`]) {
                     toast.value.error(t('entityEditor.banner.validation.linkRequired'));
                     isValid = false;
                 }
 
-                // Проверяем изображение
                 if (!banner.image && !banner.imageUrl) {
                     errors[`image-${index}`] = t('entityEditor.banner.validation.imageRequired');
                     toast.value.error(t('entityEditor.banner.validation.imageRequired'));
@@ -355,7 +326,6 @@ export default {
             return isValid;
         };
 
-        // Сохранение баннеров
         const saveBanners = async () => {
 
             if (!validateForm()) {
@@ -365,9 +335,8 @@ export default {
             isSubmitting.value = true;
 
             try {
-                // Создаем массив объектов для отправки
                 const bannersToSave = banners.value
-                    .filter(banner => banner.image) // Отфильтровываем баннеры без изображений
+                    .filter(banner => banner.image)
                     .map(banner => ({
                         title: banner.title,
                         description: banner.description,
@@ -377,7 +346,6 @@ export default {
 
                 console.log('Отправляемые баннеры:', bannersToSave);
 
-                // Отправляем массив баннеров на сервер
                 await executeSaveBanners(async () => {
                     return await bannerService.createBanner(bannersToSave);
                 }, {
@@ -386,7 +354,6 @@ export default {
                     onSuccess: () => {
                         toast.value.success(t('entityEditor.banner.saveSuccess'));
 
-                        // Добавляем небольшую задержку перед редиректом на главную
                         setTimeout(() => {
                             router.push('/');
                         }, 1500);
@@ -400,7 +367,6 @@ export default {
             }
         };
 
-        // Инициализация
         onMounted(() => {
             loadBanners();
         });
@@ -413,7 +379,7 @@ export default {
             validationState,
             errors,
             toast,
-            fileInputs, // Добавляем файловые инпуты в возвращаемые данные
+            fileInputs,
             addNewBanner,
             removeBanner,
             triggerFileInput,
@@ -429,7 +395,6 @@ export default {
 .aspect-w-16 {
     position: relative;
     padding-bottom: 31.25%;
-    /* 16:5 aspect ratio */
 }
 
 .aspect-w-16>* {

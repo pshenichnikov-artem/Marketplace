@@ -7,7 +7,6 @@
       minWidth: fixedSizes.width,
       maxWidth: fixedSizes.width
     }">
-    <!-- Картинка - фиксированная высота и ширина -->
     <div class="relative w-full bg-gray-100 rounded-t-xl overflow-hidden flex items-center justify-center" :style="{
       height: fixedSizes.imageHeight,
       minHeight: fixedSizes.imageHeight,
@@ -16,7 +15,6 @@
       <div class="image-container">
         <img :src="currentImage.url" :alt="product.name" class="product-image transition-all duration-300" />
       </div>
-      <!-- Индикаторы -->
       <div v-if="hasMultipleImages" class="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1">
         <span v-for="(img, idx) in product.images" :key="idx" :class="[
           'rounded-full',
@@ -25,7 +23,6 @@
       </div>
     </div>
 
-    <!-- Информация - фиксированная высота -->
     <div class="flex-1 flex flex-col p-2 overflow-hidden" :style="{
       height: fixedSizes.infoHeight,
       minHeight: fixedSizes.infoHeight,
@@ -47,7 +44,6 @@
         </span>
       </div>
       <div class="flex items-center mb-1">
-        <!-- Для size=tiny/small убираем надпись "seller:" -->
         <span v-if="!['tiny', 'small'].includes(size)" class="text-gray-500 text-sm">
           {{ $t('catalog.seller') }}:
         </span>
@@ -59,7 +55,6 @@
         </span>
       </div>
 
-      <!-- Для size=tiny/small показываем только цифру рейтинга без звезд -->
       <div v-if="['tiny', 'small'].includes(size)" class="flex items-center mb-1 space-x-2">
         <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md text-sm font-medium">
           {{ product.rating.toFixed(1) }}
@@ -69,7 +64,6 @@
         </span>
       </div>
 
-      <!-- Для medium и large показываем звезды рейтинга -->
       <div v-else class="flex items-center mb-1 space-x-2">
         <StarRating :rating="product.rating" :size="20" :show-value="true" />
         <span class="text-gray-400 text-sm">
@@ -77,7 +71,6 @@
         </span>
       </div>
 
-      <!-- Кнопка всегда внизу карточки -->
       <div class="mt-auto pt-1">
         <button
           class="w-full px-4 py-1.5 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition text-base"
@@ -118,7 +111,6 @@ export default {
       return Array.isArray(this.product.images) && this.product.images.length > 1;
     },
     currentImage() {
-      // Проверка на наличие массива изображений и его содержимого
       if (
         Array.isArray(this.product.images) &&
         this.product.images.length > 0 &&
@@ -128,7 +120,6 @@ export default {
       ) {
         return this.product.images[this.imageIndex];
       }
-      // Вернуть заглушку, если изображения нет
       return { url: this.fallbackImageUrl };
     },
     fullStars() {
@@ -138,33 +129,31 @@ export default {
       const r = this.product.rating - Math.floor(this.product.rating);
       return r >= 0.25 && r < 0.75;
     },
-    // Используем простой объект для определения всех размеров
     fixedSizes() {
-      // Определяем фиксированные размеры в зависимости от выбранного size
       const sizes = {
         tiny: {
           width: '162px',
-          height: '290px',  // Увеличил на 2px
+          height: '290px',
           imageHeight: '140px',
-          infoHeight: '150px'  // Увеличил на 2px
+          infoHeight: '150px'
         },
         small: {
           width: '216px',
-          height: '340px',  // Увеличил на 16px
+          height: '340px',
           imageHeight: '180px',
-          infoHeight: '160px'  // Увеличил на 16px
+          infoHeight: '160px'
         },
         medium: {
-          width: '288px',  // Было 320px, уменьшено на 10%
-          height: '432px', // Было 480px, уменьшено на 10%
-          imageHeight: '245px', // Было 272px, уменьшено на 10%
-          infoHeight: '187px'   // Было 208px, уменьшено на 10%
+          width: '288px',
+          height: '432px',
+          imageHeight: '245px',
+          infoHeight: '187px'
         },
         large: {
-          width: '306px',  // Было 340px, уменьшено на 10%
-          height: '468px', // Было 520px, уменьшено на 10%
-          imageHeight: '281px', // Было 312px, уменьшено на 10%
-          infoHeight: '187px'   // Было 208px, уменьшено на 10%
+          width: '306px',
+          height: '468px',
+          imageHeight: '281px',
+          infoHeight: '187px'
         }
       };
 
@@ -227,7 +216,6 @@ export default {
 </script>
 
 <style scoped>
-/* Настройка изображений для предотвращения растягивания контейнера */
 .image-container {
   width: 100%;
   height: 100%;
@@ -238,98 +226,78 @@ export default {
   position: relative;
 }
 
-/* Изменяем стиль изображения для растягивания по краям контейнера */
 .product-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Изменено с contain на cover для растягивания изображения */
 }
 
-/* Удаляем абсолютное позиционирование, чтобы изображение растянулось на весь контейнер */
 .product-image:hover {
   transform: scale(1.05);
 }
 
-/* Фиксированное позиционирование кнопки внизу */
 .info-content {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-/* Явно задаем выравнивание для блоков в информационной части */
 .mt-auto {
   margin-top: auto;
 }
 
-/* Обеспечиваем четкие границы для всей карточки */
 .rounded-xl {
   box-sizing: border-box;
 }
 
-/* Уменьшаем размер шрифтов пропорционально */
 .text-xs {
   font-size: 0.675rem;
-  /* 90% от стандартного text-xs */
 }
 
 .text-sm {
   font-size: 0.81rem;
-  /* 90% от стандартного text-sm */
 }
 
 .text-md,
 .text-base {
   font-size: 0.9rem;
-  /* 90% от стандартного text-base */
 }
 
 .text-lg {
   font-size: 1.035rem;
-  /* 90% от стандартного text-lg */
 }
 
 .text-xl {
   font-size: 1.17rem;
-  /* 90% от стандартного text-xl */
 }
 
 .text-2xl {
   font-size: 1.35rem;
-  /* 90% от стандартного text-2xl */
 }
 
 .text-3xl {
   font-size: 1.71rem;
-  /* 90% от стандартного text-3xl */
 }
 
-/* Адаптируем размер отступов */
 .p-2 {
   padding: 0.45rem;
-  /* 90% от стандартного p-2 */
 }
 
 .py-1\.5 {
   padding-top: 0.338rem;
-  /* 90% от стандартного py-1.5 */
   padding-bottom: 0.338rem;
 }
 
 .px-4 {
   padding-left: 0.9rem;
-  /* 90% от стандартного px-4 */
   padding-right: 0.9rem;
 }
 
-/* Корректировка стилей для режима small и tiny */
 .text-sm.py-1\.5 {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }
 
-/* Уменьшаем отступы в карточке small для экономии места */
 div[style*="height: 340px"] .p-2 {
   padding: 0.35rem;
 }
@@ -338,7 +306,6 @@ div[style*="height: 290px"] .p-2 {
   padding: 0.3rem;
 }
 
-/* Уменьшаем вертикальные отступы для компактности */
 div[style*="height: 340px"] .mb-1,
 div[style*="height: 290px"] .mb-1 {
   margin-bottom: 0.15rem;
@@ -349,21 +316,19 @@ div[style*="height: 290px"] .mb-0\.5 {
   margin-bottom: 0.05rem;
 }
 
-/* Уменьшаем отступ перед кнопкой */
 div[style*="height: 340px"] .pt-1,
 div[style*="height: 290px"] .pt-1 {
   padding-top: 0.15rem;
 }
 
-/* Улучшаем отображение описания */
 .description-truncate {
-    white-space: normal;
-    height: 2.8em;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: normal;
+  height: 2.8em;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

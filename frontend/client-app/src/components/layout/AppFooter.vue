@@ -1,7 +1,6 @@
 <template>
   <footer class="bg-gray-800 text-white py-8 mt-auto">
     <div class="container mx-auto px-4">
-      <!-- Загрузка -->
       <div v-if="isLoading" class="flex justify-center items-center py-4">
         <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-400"></div>
       </div>
@@ -15,8 +14,8 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from 'vue'; // Добавляем импорт watch
-import { useI18n } from 'vue-i18n'; // Добавляем импорт useI18n
+import { ref, onMounted, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import DOMPurify from 'dompurify';
 import pageService from '@/services/api/pageService';
 import useApiRequest from '@/hooks/useApiRequest';
@@ -28,19 +27,16 @@ export default {
 
   },
   setup() {
-    const { locale } = useI18n(); // Получаем текущую локаль
+    const { locale } = useI18n();
     const footerContent = ref('');
     const { loading: isLoading, execute } = useApiRequest();
 
-    // Очистка HTML для защиты от XSS
     const sanitizedContent = computed(() => {
       return DOMPurify.sanitize(footerContent.value);
     });
 
-    // Загрузка содержимого футера
     const loadFooterContent = async () => {
       await execute(async () => {
-        // Передаем текущую локаль вместо фиксированного 'ru'
         return await pageService.getPageByKey('footer', locale.value);
       }, {
         onSuccess: (data) => {
@@ -56,12 +52,10 @@ export default {
         }
       });
     };
-    // Получение текущего года
     const currentYear = computed(() => {
       return new Date().getFullYear();
     });
 
-    // Добавляем слежение за изменением локали
     watch(locale, () => {
       loadFooterContent();
     });
@@ -80,12 +74,10 @@ export default {
 </script>
 
 <style scoped>
-/* Стили для footer */
 footer {
   flex-shrink: 0;
 }
 
-/* Стили для внутреннего содержимого */
 .footer-content :deep(h3) {
   font-size: 1.125rem;
   font-weight: 600;
@@ -114,7 +106,6 @@ footer {
   margin-top: 0;
 }
 
-/* Анимация загрузки */
 .animate-spin {
   animation: spin 1s linear infinite;
 }

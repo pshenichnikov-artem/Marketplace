@@ -3,7 +3,6 @@
         <div class="container mx-auto px-4">
             <h2 class="text-xl font-bold mb-3 text-gray-800">{{ $t('home.recentlyViewed') }}</h2>
 
-            <!-- Контейнер с горизонтальной прокруткой -->
             <div class="relative">
                 <!-- Кнопки навигации -->
                 <button v-if="showLeftArrow" @click="scrollLeft"
@@ -56,7 +55,6 @@ export default {
 
         const { loading, error, execute } = useApiRequest();
 
-        // Загружаем недавно просмотренные продукты
         const loadRecentlyViewed = async () => {
             await execute(async () => {
                 return await historyService.getRecentlyViewed();
@@ -65,14 +63,12 @@ export default {
                     if (data) {
                         products.value = data;
 
-                        // После загрузки данных проверяем, нужно ли показывать стрелки
                         setTimeout(checkArrows, 100);
                     }
                 }
             });
         };
 
-        // Обработка горизонтальной прокрутки
         const scrollLeft = () => {
             if (!scrollContainer.value) return;
 
@@ -89,7 +85,6 @@ export default {
             container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         };
 
-        // Проверка необходимости отображения стрелок
         const checkArrows = () => {
             if (!scrollContainer.value) return;
 
@@ -103,7 +98,6 @@ export default {
             checkArrows();
         };
 
-        // Обработка изменения размера окна
         const handleResize = () => {
             checkArrows();
         };
@@ -112,7 +106,6 @@ export default {
             loadRecentlyViewed();
             window.addEventListener('resize', handleResize);
 
-            // Первичная проверка после монтирования
             setTimeout(checkArrows, 500);
         });
 
@@ -136,20 +129,15 @@ export default {
 </script>
 
 <style scoped>
-/* Скрываем стандартный скроллбар */
 .scrollbar-hide {
     -ms-overflow-style: none;
-    /* IE и Edge */
     scrollbar-width: none;
-    /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari и Opera */
 }
 
-/* Стиль для кнопок навигации */
 .scroll-button {
     position: absolute;
     top: 50%;
@@ -173,27 +161,20 @@ export default {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Стили для секции */
 .recently-viewed-section {
     position: relative;
     margin-top: auto;
     background-color: #f9fafb;
     border-top: 1px solid #e5e7eb;
     padding-bottom: 1rem;
-    /* Добавляем дополнительный отступ снизу */
 }
 
-/* Стили для карточек продуктов */
 .product-card {
     width: 180px !important;
-    /* Фиксированная ширина карточки */
     height: auto !important;
-    /* Высота подстраивается под контент */
     margin: 0 auto;
-    /* Выравнивание по центру */
 }
 
-/* Обеспечиваем, чтобы карточка не обрезалась */
 :deep(.flex-shrink-0 > div) {
     height: auto !important;
     min-height: 100% !important;

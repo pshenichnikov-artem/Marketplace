@@ -6,29 +6,14 @@
       </div>
       <h2 class="text-2xl font-bold text-gray-800 mb-6">{{ $t('login.title') }}</h2>
       <form @submit.prevent="handleLogin">
-        <ValidationInput
-            id="email"
-            :label="$t('login.email')"
-            type="email"
-            v-model="email"
-            validationRules="required|email"
-            ref="emailInput"
-            @validateInput="updateValidationState('email', $event)"
-        />
+        <ValidationInput id="email" :label="$t('login.email')" type="email" v-model="email"
+          validationRules="required|email" ref="emailInput" @validateInput="updateValidationState('email', $event)" />
 
-        <ValidationInput
-            id="password"
-            :label="$t('login.password')"
-            type="password"
-            v-model="password"
-            validationRules="required|password"
-            :error-messages="{
+        <ValidationInput id="password" :label="$t('login.password')" type="password" v-model="password"
+          validationRules="required|password" :error-messages="{
             required: $t('validation.password.required'),
             password: $t('validation.password.pattern')
-          }"
-            ref="passwordInput"
-            @validateInput="updateValidationState('password', $event)"
-        />
+          }" ref="passwordInput" @validateInput="updateValidationState('password', $event)" />
 
         <div v-if="errorMessage" class="mb-4 mt-2 text-red-600 text-sm p-2 bg-red-50 border border-red-200 rounded">
           {{ errorMessage }}
@@ -80,21 +65,17 @@ export default {
     updateValidationState(field, isValid) {
       this.validationState[field] = isValid;
     },
-    
+
     validateForm() {
-      // Валидируем все поля
       const emailValid = this.$refs.emailInput.validate();
       const passwordValid = this.$refs.passwordInput.validate();
-      
-      // Проверяем состояние валидации
+
       return Object.values(this.validationState).every(state => state === true);
     },
 
     async handleLogin() {
-      // Очищаем предыдущие сообщения об ошибках
       this.errorMessage = '';
 
-      // Проверяем валидацию перед отправкой
       const isValid = this.validateForm();
       if (!isValid) {
         return;
@@ -102,18 +83,18 @@ export default {
 
       console.log(this.email)
 
-        const response = await authService.login({email: this.email, password: this.password});
-        if (response.status === 'success') {
-          this.$router.push('/');
-        } else if (response.error?.code === 401) {
-          this.errorMessage = this.$t('serverErrors.invalidCredentials');
-        } 
-        else if (response.error?.code === 500){
-          this.errorMessage = response.message
-        }
-        else {
-          this.errorMessage = this.$t('login.loginError');
-        }
+      const response = await authService.login({ email: this.email, password: this.password });
+      if (response.status === 'success') {
+        this.$router.push('/');
+      } else if (response.error?.code === 401) {
+        this.errorMessage = this.$t('serverErrors.invalidCredentials');
+      }
+      else if (response.error?.code === 500) {
+        this.errorMessage = response.message
+      }
+      else {
+        this.errorMessage = this.$t('login.loginError');
+      }
     },
   },
 };

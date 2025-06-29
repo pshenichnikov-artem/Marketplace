@@ -1,11 +1,8 @@
 <template>
     <div class="space-y-6">
-        <!-- Проверяем, не находимся ли мы на странице редактирования или создания пользователя -->
         <router-view v-if="isUserEditorRoute"></router-view>
 
-        <!-- Если не находимся на странице редактирования, показываем список пользователей -->
         <template v-else>
-            <!-- Компонент AdminPanel для управления пользователями -->
             <AdminPanel :title="$t('dashboard.users.title')" :columns="columns" :items="users.items"
                 :total-items="users.totalItems" :current-page="currentPage" :page-size="pageSize" :sort-key="sortKey"
                 :sort-order="sortOrder" :t-function="translateFunction" :no-data-text="$t('dashboard.users.noUsers')"
@@ -25,7 +22,6 @@
                     </div>
                 </template>
 
-                <!-- Кастомная ячейка для отображения ролей с локализацией -->
                 <template #cell-role="{ value }">
                     <span class="px-2 py-1 text-xs font-semibold rounded-full" :class="getRoleBadgeClass(value)">
                         {{ $t(`dashboard.users.roles.${value}`) }}
@@ -39,7 +35,6 @@
                 :confirm-text="$t('dashboard.users.confirmDelete')" :cancel-text="$t('dashboard.users.cancelDelete')"
                 @confirm="deleteUser" @cancel="showDeleteModal = false" />
 
-            <!-- Уведомления -->
             <Notification ref="toast" />
         </template>
     </div>
@@ -70,30 +65,25 @@ export default {
         const router = useRouter();
         const route = useRoute();
 
-        // Определяем, находимся ли мы на странице редактирования или создания пользователя
         const isUserEditorRoute = computed(() => {
             return route.path.includes('/dashboard/users/edit/') ||
                 route.path.includes('/dashboard/users/create');
         });
 
-        // Состояние таблицы
         const users = ref({ items: [], totalItems: 0 });
         const currentPage = ref(1);
         const pageSize = ref(20);
         const sortKey = ref('id');
         const sortOrder = ref('desc');
 
-        // Фильтры (заменяем name на search и убираем email)
         const filters = reactive({
             search: '',
             role: ''
         });
 
-        // Модальные окна
         const showDeleteModal = ref(false);
         const userToDelete = ref(null);
 
-        // Роли для фильтра
         const roleOptions = computed(() => [
             { label: t('dashboard.users.filters.allRoles'), value: '' },
             { label: t('dashboard.users.roles.admin'), value: 'admin' },
@@ -101,7 +91,6 @@ export default {
             { label: t('dashboard.users.roles.user'), value: 'user' }
         ]);
 
-        // Определение колонок таблицы
         const columns = computed(() => [
             { key: 'id', label: 'ID', sortable: true, width: 'w-16' },
             { key: 'firstName', label: t('dashboard.users.columns.firstName'), sortable: true },
@@ -111,11 +100,9 @@ export default {
             { key: 'phone', label: t('dashboard.users.columns.phone'), sortable: true, width: 'w-40' }
         ]);
 
-        // API хуки
         const { loading: usersLoading, execute: executeUsersFetch } = useApiRequest();
         const { loading: deleteLoading, execute: executeDelete } = useApiRequest();
 
-        // Получаем CSS класс для бейджа роли
         const getRoleBadgeClass = (role) => {
             switch (role) {
                 case 'admin':
@@ -127,7 +114,6 @@ export default {
             }
         };
 
-        // Загрузка списка пользователей
         const fetchUsers = async () => {
             await executeUsersFetch(async () => {
                 const params = {
@@ -153,16 +139,13 @@ export default {
             });
         };
 
-        // Функция инициализации данных
         const initializeData = () => {
             if (!isUserEditorRoute.value) {
                 fetchUsers();
             }
         };
 
-        // Наблюдение за изменениями маршрута
         watch(() => route.path, (newPath, oldPath) => {
-            // Если мы возвращаемся из редактирования или создания на список пользователей
             if (
                 (oldPath.includes('/dashboard/users/edit/') || oldPath.includes('/dashboard/users/create')) &&
                 newPath === '/dashboard/users'
@@ -170,15 +153,12 @@ export default {
                 initializeData();
             }
         });
-
-        // Загрузка данных при монтировании компонента
         onMounted(() => {
             initializeData();
         });
 
-        // Обработчики событий
         const applyFilters = () => {
-            currentPage.value = 1; // Сбрасываем страницу при применении фильтров
+            currentPage.value = 1;
             fetchUsers();
         };
 
@@ -206,7 +186,6 @@ export default {
             fetchUsers();
         };
 
-        // Функции для навигации
         const openAddUserModal = () => {
             router.push('/dashboard/users/create');
         };
@@ -228,7 +207,7 @@ export default {
             }, {
                 onSuccess: () => {
                     toast.value.success(t('common.messages.deleteSuccess'));
-                    fetchUsers(); // Обновляем список после удаления
+                    fetchUsers();
                 },
                 showErrorNotification: true,
                 notificationRef: toast
@@ -238,7 +217,6 @@ export default {
             userToDelete.value = null;
         };
 
-        // Функция для передачи в AdminPanel
         const translateFunction = (key) => {
             return t(key);
         };
@@ -267,12 +245,8 @@ export default {
             deleteUser,
             translateFunction,
             isUserEditorRoute,
-            getRoleBadgeClass // Добавляем функцию для стилизации ролей в шаблоне
+            getRoleBadgeClass
         };
     }
 };
 </script>
-
-<style scoped>
-/* Дополнительные стили при необходимости */
-</style>

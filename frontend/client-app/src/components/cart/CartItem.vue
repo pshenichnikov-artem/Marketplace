@@ -94,7 +94,6 @@
           <div class="flex justify-between items-center mt-1">
             <div class="text-xs text-gray-500">{{ $t('cart.inStock') }}: <span class="text-gray-800">{{
               item.product.stockQuantity }}</span></div>
-            <!-- Перемещаем кнопку удаления в правый верхний угол -->
             <button @click="handleDelete" :disabled="isLoading" class="text-red-500 hover:text-red-700 p-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -135,7 +134,7 @@
           </button>
         </div>
 
-        <!-- Итоговая цена с подписью -->
+        <!-- Итоговая цена -->
         <div class="flex flex-col items-end">
           <span class="text-xs text-gray-500">{{ $t('cart.totalPrice') }}:</span>
           <div class="text-indigo-600 font-semibold text-base">
@@ -144,7 +143,6 @@
         </div>
       </div>
 
-      <!-- Добавляем кнопку "Перейти к товару" -->
       <div class="mt-2 flex justify-end">
         <router-link :to="`/product/${item.product.id}`"
           class="text-xs text-indigo-600 hover:text-indigo-800 underline">
@@ -236,7 +234,7 @@ export default {
 
         if (result.status === "success") {
           this.$emit('item-deleted', this.item.id);
-          // Уведомлять MainNavbar об удалении теперь будет CartPage
+
         } else {
           console.error('Ошибка при удалении товара из корзины:', result.message);
         }
@@ -251,13 +249,11 @@ export default {
 </script>
 
 <style scoped>
-/* Обеспечиваем доступный размер кнопок для тачскринов */
 button {
   min-height: 32px;
   min-width: 32px;
 }
 
-/* Увеличиваем размеры кнопок на мобильных */
 @media (max-width: 640px) {
   button[class*="w-8"] {
     min-height: 36px;
@@ -265,7 +261,7 @@ button {
   }
 }
 
-/* Ограничение высоты описания для мобильной версии */
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;

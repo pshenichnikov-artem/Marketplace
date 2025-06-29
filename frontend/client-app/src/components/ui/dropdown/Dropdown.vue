@@ -69,7 +69,6 @@ export default {
     let dropdownTimer = null;
     let closeTimer = null;
 
-    // Используем вычисляемое свойство для объединения внутреннего состояния и пропса
     const isOpenComputed = computed(() => props.isOpen || isOpenInternal.value);
 
     const filteredOptions = computed(() => {
@@ -102,7 +101,6 @@ export default {
       emit('update:isOpen', true);
       highlightedIndex.value = 0;
 
-      // Обновляем позицию при открытии
       nextTick(() => {
         updateDropdownPosition();
       });
@@ -128,7 +126,6 @@ export default {
 
     function selectOption(option) {
       if (props.selectOnlyLeaf && option.children?.length) return;
-      // Исправляем передачу значения при выборе опции
       const value = option.id !== undefined ? option.id : (option.value !== undefined ? option.value : null);
       emit('update:modelValue', value);
       emit('select', option);
@@ -136,27 +133,21 @@ export default {
     }
 
     function onClickOutside(event) {
-      // Отменяем предыдущий таймер, если он был установлен
       clearTimeout(closeTimer);
 
-      // Проверяем, содержится ли клик в основном дропдауне
       const isInMainDropdown = dropdown.value && dropdown.value.contains(event.target);
 
-      // Проверяем, содержится ли клик в каком-либо подменю
       const isInSubmenu = document.querySelector('.fixed.z-50')?.contains(event.target);
 
-      // Проверяем, является ли элемент, по которому кликнули, частью DropdownOption
       const isInDropdownOption = event.target.closest('.dropdown-option');
 
       if (!isInMainDropdown && !isInSubmenu && !isInDropdownOption) {
-        // Устанавливаем небольшую задержку перед закрытием
         closeTimer = setTimeout(() => {
           close();
         }, 50);
       }
     }
 
-    // Функция для обновления позиции выпадающего списка
     function updateDropdownPosition() {
       if (!anchor.value) return;
 
@@ -171,7 +162,6 @@ export default {
       };
     }
 
-    // Вычисляемое свойство для стилей выпадающего списка
     const dropdownStyle = computed(() => {
       return {
         top: `${dropdownPosition.value.top}px`,
@@ -185,7 +175,6 @@ export default {
       };
     });
 
-    // Слушаем события прокрутки и изменения размеров
     function setupEventListeners() {
       window.addEventListener('scroll', updateDropdownPosition);
       window.addEventListener('resize', updateDropdownPosition);
@@ -211,7 +200,6 @@ export default {
       clearTimeout(closeTimer);
     });
 
-    // Следим за изменениями пропса isOpen
     watch(() => props.isOpen, (newVal) => {
       if (newVal) {
         open();
@@ -266,7 +254,6 @@ ul {
   border-radius: 4px;
 }
 
-/* Анимация появления/исчезновения */
 .dropdown-enter-active,
 .dropdown-leave-active {
   transition: opacity 0.2s, transform 0.2s;

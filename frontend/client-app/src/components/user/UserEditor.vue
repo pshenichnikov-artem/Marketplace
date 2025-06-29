@@ -1,9 +1,7 @@
 <template>
     <div class="max-w-5xl mx-auto">
-        <!-- Используем общий компонент EntityEditor в качестве оболочки -->
         <EntityEditor :title="isEditMode ? $t('entityEditor.user.title.edit') : $t('entityEditor.user.title.create')"
             :is-saving="isSaving" :back-link="'/dashboard/users'" @back="handleBack" @save="saveUser">
-            <!-- Дополнительные действия в шапке -->
             <template v-if="isEditMode" #actions>
                 <button @click="confirmDelete"
                     class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center shadow-sm hover:shadow-md">
@@ -16,9 +14,7 @@
                 </button>
             </template>
 
-            <!-- Основное содержимое формы редактирования пользователя -->
             <div class="space-y-6">
-                <!-- Индикатор загрузки при инициализации редактора -->
                 <div v-if="isLoading" class="flex justify-center items-center py-8">
                     <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
                 </div>
@@ -27,7 +23,6 @@
                 <div v-else class="flex flex-col md:flex-row gap-6">
                     <!-- Левая колонка -->
                     <div class="md:w-7/12 space-y-6">
-                        <!-- 1. Секция основной информации -->
                         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500"
@@ -91,7 +86,6 @@
                             </div>
                         </div>
 
-                        <!-- 2. Секция адреса -->
                         <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500"
@@ -103,7 +97,6 @@
                                 <h3 class="font-semibold text-gray-800">{{ $t('entityEditor.user.address') }}</h3>
                             </div>
                             <div class="p-5">
-                                <!-- Адрес -->
                                 <ValidationInput id="address" :label="$t('entityEditor.user.addressLine')"
                                     type="textarea" v-model="userData.address"
                                     :placeholder="$t('entityEditor.user.addressPlaceholder')" rows="3"
@@ -114,7 +107,7 @@
 
                     <!-- Правая колонка -->
                     <div class="md:w-5/12">
-                        <!-- Секция пароля (только для создания нового пользователя) -->
+                        <!-- Секция пароля  -->
                         <div v-if="!isEditMode"
                             class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
@@ -150,7 +143,7 @@
                             </div>
                         </div>
 
-                        <!-- Секция смены пароля (только для редактирования пользователя) -->
+                        <!-- Секция смены пароля -->
                         <div v-if="isEditMode"
                             class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                             <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
@@ -201,7 +194,6 @@
             :confirm-text="$t('entityEditor.user.deleteConfirmButton')"
             :cancel-text="$t('entityEditor.user.deleteCancel')" @confirm="deleteUser" @cancel="cancelDelete" />
 
-        <!-- Уведомления -->
         <Notification ref="toast" />
     </div>
 </template>
@@ -239,7 +231,6 @@ export default {
 
         const toast = ref(null);
 
-        // Рефы для ValidationInput
         const firstNameInput = ref(null);
         const lastNameInput = ref(null);
         const emailInput = ref(null);
@@ -248,12 +239,10 @@ export default {
         const passwordInput = ref(null);
         const confirmPasswordInput = ref(null);
 
-        // Состояния
         const isLoading = ref(false);
         const isSaving = ref(false);
         const showDeleteModal = ref(false);
 
-        // Данные пользователя
         const userData = reactive({
             id: null,
             firstName: '',
@@ -266,17 +255,14 @@ export default {
             confirmPassword: ''
         });
 
-        // Режим (создание или редактирование)
         const isEditMode = computed(() => !!props.id);
 
-        // Список ролей
         const roles = [
             { label: t('dashboard.users.roles.user'), value: 'user' },
             { label: t('dashboard.users.roles.seller'), value: 'seller' },
             { label: t('dashboard.users.roles.admin'), value: 'admin' }
         ];
 
-        // Валидация
         const validationState = reactive({
             firstName: false,
             lastName: false,
@@ -296,23 +282,19 @@ export default {
             confirmPassword: ''
         });
 
-        // Метод для обновления состояния валидации
         const updateValidationState = (field, isValid) => {
             validationState[field] = isValid;
         };
 
-        // API хуки
         const { loading: loadingUser, execute: executeLoadUser } = useApiRequest();
         const { loading: savingUser, execute: executeSaveUser } = useApiRequest();
         const { loading: deletingUser, execute: executeDeleteUser } = useApiRequest();
 
-        // Отслеживание состояния загрузки
         const watchLoading = () => {
             isLoading.value = loadingUser.value;
             isSaving.value = savingUser.value;
         };
 
-        // Загрузка данных пользователя при редактировании
         const loadUser = async () => {
             if (!props.id) return;
 
@@ -322,7 +304,6 @@ export default {
                 onSuccess: (data) => {
                     if (data) {
                         const user = data;
-                        // Заполняем поля формы данными загруженного пользователя
                         userData.id = user.id;
                         userData.firstName = user.firstName;
                         userData.lastName = user.lastName;
@@ -331,7 +312,6 @@ export default {
                         userData.address = user.address || '';
                         userData.role = user.role || 'user';
 
-                        // Запускаем валидацию полей после загрузки данных
                         validateAllFields();
                     }
                 },
@@ -342,7 +322,6 @@ export default {
             watchLoading();
         };
 
-        // Валидация полей формы
         const validateField = (field) => {
             switch (field) {
                 case 'firstName':
@@ -394,11 +373,9 @@ export default {
                     break;
             }
 
-            // Обновляем состояние валидации
             validationState[field] = !errors[field];
         };
 
-        // Валидация всех полей
         const validateAllFields = () => {
             firstNameInput.value?.validate();
             lastNameInput.value?.validate();
@@ -417,7 +394,6 @@ export default {
         const validateForm = () => {
             validateAllFields();
 
-            // Собираем все ошибки валидации
             const errorMessages = [];
 
             if (!validationState.firstName) {
@@ -461,7 +437,6 @@ export default {
                     }
                 }
             } else if (userData.password) {
-                // Если при редактировании указан пароль, проверяем его требования
                 if (!validationState.password) {
                     errorMessages.push(t('entityEditor.user.validation.passwordMinLength'));
                 }
@@ -471,7 +446,6 @@ export default {
                 }
             }
 
-            // Если есть ошибки, отображаем их через Notification
             if (errorMessages.length > 0) {
                 errorMessages.forEach(message => {
                     toast.value.error(message);
@@ -482,14 +456,11 @@ export default {
             return true;
         };
 
-        // Методы для управления пользователем
         const saveUser = async () => {
-            // Валидируем форму
             if (!validateForm()) {
                 return;
             }
 
-            // Подготавливаем данные для отправки
             const userToSave = {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
@@ -499,7 +470,6 @@ export default {
                 role: userData.role
             };
 
-            // Добавляем пароль, если он указан
             if (userData.password) {
                 userToSave.password = userData.password;
             }
@@ -554,9 +524,7 @@ export default {
             router.push('/dashboard/users');
         };
 
-        // Инициализация
         onMounted(async () => {
-            // Если это режим редактирования, загружаем данные пользователя
             if (isEditMode.value) {
                 await loadUser();
             }

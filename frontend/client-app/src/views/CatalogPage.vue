@@ -45,7 +45,6 @@
     </main>
     <AppFooter />
 
-    <!-- Компонент уведомлений -->
     <Notification ref="toast" />
   </div>
 </template>
@@ -89,10 +88,8 @@ export default {
     const pagination = ref(null);
     const toast = ref(null);
 
-    // API хук
     const { loading, error, execute } = useApiRequest();
 
-    // Динамически определяем размер карточки
     const cardSize = computed(() => {
       if (windowWidth.value < 450) {
         return 'tiny';
@@ -106,7 +103,6 @@ export default {
       }
     });
 
-    // Загрузка продуктов
     const fetchProducts = async () => {
       await execute(async () => {
         const params = {};
@@ -123,7 +119,7 @@ export default {
           filters.value.search || undefined,
           filters.value.sortBy || undefined,
           filters.value.category || undefined,
-          null, // sellerId
+          null,
           pageSize.value,
           filters.value.minPrice || undefined,
           filters.value.maxPrice || undefined
@@ -138,7 +134,6 @@ export default {
       });
     };
 
-    // Инициализация из URL
     const initFromUrl = () => {
       const query = window.location.search
         ? Object.fromEntries(new URLSearchParams(window.location.search))
@@ -158,7 +153,6 @@ export default {
       fetchProducts();
     };
 
-    // Вспомогательные функции для парсинга параметров
     const parseCategory = (value) => {
       if (!value) return null;
       if (value === 'null') return null;
@@ -172,12 +166,10 @@ export default {
       return isNaN(parsed) ? null : parsed;
     };
 
-    // Обработчик изменения размера окна
     const handleResize = () => {
       windowWidth.value = window.innerWidth;
     };
 
-    // Применение фильтров
     const applyFilters = (newFilters) => {
       filters.value = { ...newFilters };
       currentPage.value = 1;
@@ -185,7 +177,6 @@ export default {
       updateUrl();
     };
 
-    // Сброс фильтров
     const resetFilters = () => {
       filters.value = {
         category: null,
@@ -199,7 +190,6 @@ export default {
       updateUrl();
     };
 
-    // Обработка пагинации
     const onPaginationChange = ({ page, pageSize: newPageSize }) => {
       currentPage.value = page;
       pageSize.value = newPageSize;
@@ -207,7 +197,6 @@ export default {
       updateUrl();
     };
 
-    // Обновление URL
     const updateUrl = () => {
       const query = {};
 
@@ -224,18 +213,15 @@ export default {
       const queryString = new URLSearchParams(query).toString();
       const newUrl = queryString ? `?${queryString}` : window.location.pathname;
 
-      // Обновляем URL без перезагрузки страницы
       window.history.pushState(
         { path: newUrl },
         '',
         newUrl
       );
 
-      // Загружаем продукты с новыми параметрами
       fetchProducts();
     };
 
-    // Наблюдатели и хуки жизненного цикла
     onMounted(() => {
       window.addEventListener('resize', handleResize);
       initFromUrl();
@@ -271,27 +257,21 @@ export default {
 </script>
 
 <style scoped>
-/* Обеспечиваем одинаковое расстояние между карточками на всех размерах экрана */
 .grid {
   min-width: 0;
-  /* Важно для предотвращения переполнения карточек */
 }
 
-/* Предотвращаем наложение карточек друг на друга */
 .grid>* {
   min-width: 0;
   max-width: 100%;
 }
 
-/* Уменьшаем отступы на маленьких экранах для максимального использования пространства */
 @media (max-width: 480px) {
   .grid {
     gap: 0.75rem;
-    /* 12px вместо 1.5rem (24px) */
   }
 }
 
-/* Добавляем горизонтальное центрирование карточек */
 @media (min-width: 768px) and (max-width: 1023px) {
   .grid {
     justify-content: center;
@@ -302,21 +282,17 @@ export default {
   }
 }
 
-/* Улучшаем контейнер для карточек продуктов */
 .product-grid {
   display: grid;
   justify-content: center;
   justify-items: center;
 }
 
-/* Гарантируем, что карточки не будут растягиваться даже в контейнере с flex-grow */
 .product-grid>* {
   width: max-content !important;
 }
 
 @media (max-width: 639px) {
-
-  /* На очень маленьких экранах уменьшаем отступы еще больше */
   .product-grid {
     column-gap: 0.5rem;
     row-gap: 1rem;

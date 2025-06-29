@@ -23,7 +23,7 @@
                     <slot name="filters"></slot>
                 </div>
 
-                <!-- Кнопки управления фильтрами (теперь слева) -->
+                <!-- Кнопки управления фильтрами -->
                 <div class="flex items-center gap-3">
                     <button @click="$emit('apply-filters')"
                         class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center shadow-sm hover:shadow-md">
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <!-- Таблица данных - фиксируем контейнер и делаем прокрутку только для таблицы -->
+        <!-- Таблица данных  -->
         <div class="relative w-full">
             <div class="table-wrapper">
                 <div class="max-h-[600px] overflow-y-auto table-container">
@@ -66,7 +66,7 @@
                                         <span>{{ column.label }}</span>
                                     </div>
                                 </th>
-                                <!-- Заголовок для столбца с действиями - всегда виден -->
+                                <!-- Заголовок для столбца с действиями-->
                                 <th scope="col"
                                     class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider actions-column sticky right-0 bg-gray-50 z-20">
                                     {{ $t('dashboard.admin.actions') }}
@@ -159,7 +159,6 @@
                                                 </svg>
                                             </button>
 
-                                            <!-- Используем teleport для размещения меню в body -->
                                             <teleport to="body">
                                                 <div v-if="activeActionsRow === rowIndex"
                                                     class="fixed z-50 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 rounded-md shadow-lg focus:outline-none"
@@ -225,7 +224,7 @@
             </div>
         </div>
 
-        <!-- Пагинация и отображение статистики -->
+        <!-- Пагинация -->
         <div
             class="bg-gray-50 px-6 py-4 flex flex-col md:flex-row gap-3 justify-between items-center border-t border-gray-200">
             <BasePagination v-if="totalItems > 0" :total-items="totalItems" :current-page="currentPage"
@@ -308,25 +307,20 @@ export default {
         const activeActionsRow = ref(null);
         const actionsDropdown = ref([]);
 
-
-        // Переключение видимости меню действий
         const toggleActions = (rowIndex) => {
             activeActionsRow.value = activeActionsRow.value === rowIndex ? null : rowIndex;
         };
 
-        // Получение значения из объекта по вложенному пути ('user.name' => item.user.name)
         const getItemValue = (item, key) => {
             if (!key || !item) return '';
             return key.split('.').reduce((obj, k) => (obj && obj[k] !== undefined ? obj[k] : ''), item);
         };
 
-        // Обработка нажатия на кнопку "Edit"
         const handleEdit = (item) => {
             emit('edit', item);
             activeActionsRow.value = null;
         };
 
-        // Обработка нажатия на кнопку "Delete"
         const handleDelete = (item) => {
             emit('delete', item);
             activeActionsRow.value = null;
@@ -342,7 +336,7 @@ export default {
                 const pad = (n) => String(n).padStart(2, '0');
 
                 const day = pad(date.getDate());
-                const month = pad(date.getMonth() + 1); // месяцы от 0
+                const month = pad(date.getMonth() + 1);
                 const year = date.getFullYear();
 
                 const hours = pad(date.getHours());
@@ -355,7 +349,6 @@ export default {
             }
         }
 
-        // Форматирование числа
         const formatNumber = (value) => {
             if (value === null || value === undefined) return '';
             return new Intl.NumberFormat(locale.value).format(value);
@@ -376,14 +369,12 @@ export default {
             }
         };
 
-        // Метод для получения класса статуса с помощью утилиты
         const getStatusClass = (status, context = 'common') => {
             if (!status) return 'bg-gray-100 text-gray-800';
             const statusInfo = getStatusInfo(status, context);
             return statusInfo.cssClass;
         };
 
-        // Метод для получения переведенного статуса
         const getTranslatedStatus = computed(() => {
 
             return (status, context = 'common') => {
@@ -394,30 +385,25 @@ export default {
             };
         });
 
-        // Вычисление позиции для выпадающего меню действий
         const getActionMenuPosition = (rowIndex) => {
             if (!actionsDropdown.value[rowIndex]) return { top: '0px', left: '0px' };
 
             const element = actionsDropdown.value[rowIndex];
             const rect = element.getBoundingClientRect();
 
-            // Получаем размеры окна просмотра
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
 
-            // Базовая позиция (правый верхний угол кнопки действий)
             let top = rect.bottom + window.scrollY;
-            let left = rect.right - 192; // Ширина меню примерно 12rem (192px)
+            let left = rect.right - 192;
 
-            // Проверка, не выходит ли меню за пределы экрана справа
             if (left + 192 > viewportWidth) {
-                left = viewportWidth - 200; // Оставляем небольшой отступ от края
+                left = viewportWidth - 200;
             }
 
-            // Проверка, не выходит ли меню за пределы экрана снизу
-            const menuHeight = 100; // Приблизительная высота меню (зависит от количества пунктов)
+            const menuHeight = 100;
             if (top + menuHeight > viewportHeight + window.scrollY) {
-                // Размещаем над кнопкой вместо размещения под ней
+
                 top = rect.top + window.scrollY - menuHeight;
             }
 
@@ -427,7 +413,6 @@ export default {
             };
         };
 
-        // Закрываем выпадающее меню действий при клике вне элемента
         const handleClickOutside = (event) => {
             if (activeActionsRow.value !== null) {
                 const currentDropdown = actionsDropdown.value[activeActionsRow.value];
@@ -465,7 +450,6 @@ export default {
 </script>
 
 <style scoped>
-/* Анимация для выпадающего меню действий */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -494,7 +478,6 @@ div[role="menu"] {
     animation: fadeIn 0.1s ease-out;
 }
 
-/* Стилизация кнопок с изображениями */
 button svg {
     transition: transform 0.15s ease-in-out;
 }
@@ -508,7 +491,6 @@ button:hover svg {
     transition: transform 0.2s ease-in-out;
 }
 
-/* Обертка для таблицы с фиксированной шириной */
 .table-wrapper {
     width: 100%;
     overflow: hidden;
@@ -516,7 +498,6 @@ button:hover svg {
     border-radius: 0.5rem;
 }
 
-/* Стилизация таблицы с горизонтальной и вертикальной прокруткой */
 .table-container {
     overflow-x: auto;
     overflow-y: auto;
@@ -527,7 +508,6 @@ button:hover svg {
     max-width: 100%;
 }
 
-/* Стили для скроллбара */
 .table-container::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -543,21 +523,17 @@ button:hover svg {
     border-radius: 4px;
 }
 
-/* Таблица с фиксированной шириной */
 table {
     width: 100%;
     table-layout: fixed;
     max-width: none;
-    /* Важно: отменяем max-width, чтобы таблица не сжималась */
 }
 
-/* Колонки с заданной шириной */
 th,
 td {
     box-sizing: border-box;
 }
 
-/* Фиксированный заголовок таблицы */
 thead.sticky {
     position: sticky;
     top: 0;
@@ -565,7 +541,6 @@ thead.sticky {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Колонка действий прилипает справа с высоким z-index */
 .actions-column {
     position: sticky;
     right: 0;
@@ -575,7 +550,6 @@ thead.sticky {
     max-width: 100px;
 }
 
-/* Улучшенные тени для фиксированной колонки действий */
 td.actions-column {
     box-shadow: -4px 0 6px -4px rgba(0, 0, 0, 0.1);
 }
@@ -584,7 +558,6 @@ th.actions-column {
     box-shadow: -4px 0 6px -4px rgba(0, 0, 0, 0.1);
 }
 
-/* Обеспечиваем, чтобы при наведении строка не перекрывала колонку действий */
 tr:hover td:not(.actions-column) {
     background-color: rgba(249, 250, 251, 1);
 }
@@ -593,32 +566,27 @@ tr:hover td.actions-column {
     background-color: white;
 }
 
-/* Стили для таблицы и ячеек */
 table {
     table-layout: fixed;
     width: 100%;
 }
 
-/* Убираем стиль, который расширяет минимальную ширину таблицы */
 table {
     min-width: 0;
 }
 
-/* Основные стили для ячеек */
 th,
 td {
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Ячейки с контентом (название, описание) */
 td.content-cell {
     white-space: normal;
     max-width: 250px;
     overflow: hidden;
 }
 
-/* Стили для ограничения строк текста */
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -626,7 +594,6 @@ td.content-cell {
     overflow: hidden;
 }
 
-/* Специальные колонки */
 .description-column {
     width: 250px;
     min-width: 250px;
@@ -638,7 +605,6 @@ td.content-cell {
     word-wrap: break-word;
 }
 
-/* Убираем фиксированную ширину для ячеек из предыдущего CSS */
 :deep(th),
 :deep(td) {
     white-space: normal;

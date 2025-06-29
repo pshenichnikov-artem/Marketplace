@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen bg-gray-50">
     <MainNavbar />
-
-    <!-- Основной контент -->
     <div class="flex-grow px-4 py-8 lg:py-12">
       <div class="container mx-auto">
         <!-- Заголовок для мобильных устройств -->
@@ -86,19 +84,17 @@
                 </h1>
               </div>
 
-              <!-- Контент активной вкладки -->
               <div class="p-6">
                 <transition name="fade" mode="out-in" enter-active-class="transition-opacity ease-in-out duration-300"
                   leave-active-class="transition-opacity ease-in-out duration-300" enter-from-class="opacity-0"
                   leave-to-class="opacity-0">
-                  <div :key="isSeller ? 'info' : activeTab"> <!-- Обертка для содержимого transition -->
+                  <div :key="isSeller ? 'info' : activeTab">
                     <ProfileInfo v-if="isSeller || activeTab === 'info'" :is-admin="isAdmin" />
                     <ProfileOrders v-if="!isSeller && activeTab === 'orders'" />
                     <ProfileComments v-if="!isSeller && activeTab === 'comments'" />
                   </div>
                 </transition>
 
-                <!-- Отображаем статистику для обычных пользователей на мобильных устройствах -->
                 <div v-if="!isSeller && isMobile" class="mt-8">
                   <ProfileStats />
                 </div>
@@ -137,24 +133,19 @@ export default {
     const activeTab = ref('info');
     const windowWidth = ref(window.innerWidth);
 
-    // Определяем, является ли устройство мобильным
     const isMobile = computed(() => windowWidth.value < 768);
 
-    // Определяем роли
     const isAdmin = computed(() => getUserRole() === 'admin');
     const isSeller = computed(() => getUserRole() === 'seller');
 
-    // Обработчик изменения размера окна
     const handleResize = () => {
       windowWidth.value = window.innerWidth;
     };
 
-    // Отслеживаем изменения хэша в URL для переключения вкладок
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash) {
         const tab = hash.substring(1);
-        // Для продавца показываем только вкладку info
         if (isSeller.value) {
           activeTab.value = 'info';
           window.location.hash = '#info';
@@ -166,7 +157,7 @@ export default {
 
     onMounted(() => {
       window.addEventListener('resize', handleResize);
-      handleHashChange(); // Инициализация по хэшу URL
+      handleHashChange();
       window.addEventListener('hashchange', handleHashChange);
     });
 
@@ -175,9 +166,7 @@ export default {
       window.removeEventListener('hashchange', handleHashChange);
     });
 
-    // Наблюдаем за изменениями в activeTab
     const watchActiveTab = (tab) => {
-      // Для продавца всегда отображаем только вкладку info
       if (isSeller.value && tab !== 'info') {
         activeTab.value = 'info';
         window.location.hash = '#info';
@@ -195,7 +184,6 @@ export default {
     };
   },
   watch: {
-    // Обновляем URL при смене вкладки
     activeTab: {
       handler(tab) {
         this.watchActiveTab(tab);
@@ -206,13 +194,11 @@ export default {
 </script>
 
 <style scoped>
-/* Тени для элементов при наведении */
 .shadow:hover {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s ease-in-out;
 }
 
-/* Стили для мобильной навигации */
 select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234B5563'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
@@ -222,7 +208,6 @@ select {
   padding-right: 2.5rem;
 }
 
-/* Дополнительные медиа-запросы для адаптивности */
 @media (max-width: 640px) {
   .container {
     padding: 0;

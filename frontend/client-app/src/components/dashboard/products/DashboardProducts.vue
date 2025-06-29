@@ -1,18 +1,14 @@
 <template>
     <div class="space-y-6">
-        <!-- Проверяем, не находимся ли мы на странице редактирования или создания продукта -->
         <router-view v-if="isProductEditorRoute"></router-view>
 
-        <!-- Если не находимся на странице редактирования, показываем список продуктов -->
         <template v-else>
-            <!-- Компонент AdminPanel для управления товарами -->
             <AdminPanel :title="$t('dashboard.products.title')" :columns="columns" :items="products.items"
                 :total-items="products.totalItems" :current-page="currentPage" :page-size="pageSize"
                 :no-data-text="$t('dashboard.products.noProducts')"
                 :no-data-subtext="$t('dashboard.products.noProductsSubtext')" @add-new="openAddProductModal"
                 @edit="openEditProductModal" @delete="confirmDeleteProduct" @apply-filters="applyFilters"
                 @reset-filters="resetFilters" @pagination-change="handlePaginationChange">
-                <!-- Слот для фильтров -->
                 <template #filters>
                     <div class="form-group">
                         <BaseFilterField :label="$t('dashboard.products.filters.name')" type="text"
@@ -20,7 +16,6 @@
                     </div>
 
                     <div class="form-group">
-                        <!-- Используем FilterFieldWithDropdown для категорий -->
                         <FilterFieldWithDropdown :label="$t('dashboard.products.filters.category')" icon="category"
                             v-model="filters.categoryId" :options="categoryOptions"
                             :placeholder="$t('dashboard.products.filters.allCategories')"
@@ -28,7 +23,6 @@
                             @select="onCategorySelected" />
                     </div>
 
-                    <!-- Сортировка -->
                     <div class="form-group">
                         <BaseFilterField :label="$t('dashboard.products.filters.sortBy')" type="select"
                             v-model="sortOption" :options="sortOptions" icon="sort" @change="handleSortChange" />
@@ -55,14 +49,12 @@
 
             </AdminPanel>
 
-            <!-- Модальное окно подтверждения удаления -->
             <ConfirmModal v-if="showDeleteModal" :title="$t('dashboard.products.deleteTitle')"
                 :message="$t('dashboard.products.deleteMessage', { name: productToDelete?.name || 'product' })"
                 :confirm-text="$t('dashboard.products.confirmDelete')"
                 :cancel-text="$t('dashboard.products.cancelDelete')" @confirm="deleteProduct"
                 @cancel="showDeleteModal = false" />
 
-            <!-- Уведомления -->
             <Notification ref="toast" />
         </template>
     </div>
@@ -98,28 +90,23 @@ export default {
         const router = useRouter();
         const route = useRoute();
 
-        // Определяем, находимся ли мы на странице редактирования или создания продукта
         const isProductEditorRoute = computed(() => {
             return route.path.includes('/dashboard/products/edit/') ||
                 route.path.includes('/dashboard/products/create');
         });
 
-        // Состояние таблицы
         const products = ref({ items: [], totalItems: 0 });
         const categories = ref([]);
         const currentPage = ref(1);
         const pageSize = ref(20);
 
-        // Изменяем управление сортировкой
         const sortKey = ref('id');
         const sortOrder = ref('desc');
-        const sortOption = ref('id_desc'); // Новое свойство для выбора опции сортировки
+        const sortOption = ref('id_desc');
 
-        // Состояние для выпадающего списка категорий
         const isCategoryDropdownOpen = ref(false);
         const categorySearch = ref('');
 
-        // Фильтры
         const filters = reactive({
             name: '',
             categoryId: '',
@@ -127,23 +114,19 @@ export default {
             maxPrice: ''
         });
 
-        // Модальные окна
         const showDeleteModal = ref(false);
         const productToDelete = ref(null);
 
-        // Получение имени выбранной категории
         const selectedCategoryName = computed(() => {
             if (!filters.categoryId) return '';
             const category = categories.value.find(c => c.id === parseInt(filters.categoryId));
             return category ? category.name : '';
         });
 
-        // Преобразование категорий в формат для выпадающего списка
         const categoryOptions = computed(() => {
             return prepareCategoryOptions(categories.value, t('dashboard.products.filters.allCategories'));
         });
 
-        // Опции сортировки
         const sortOptions = computed(() => [
             { label: t('dashboard.products.filters.sortOptions.nameAsc'), value: 'name_asc' },
             { label: t('dashboard.products.filters.sortOptions.nameDesc'), value: 'name_desc' },
@@ -155,12 +138,10 @@ export default {
             { label: t('dashboard.products.filters.sortOptions.dateDesc'), value: 'id_desc' }
         ]);
 
-        // Обработчик выбора категории
         const onCategorySelected = (option) => {
             filters.categoryId = option.value || option.id || '';
         };
 
-        // Определение колонок таблицы с явно заданной шириной
         const columns = computed(() => [
             { key: 'id', label: 'ID', width: 'w-16', style: 'width: 60px; min-width: 60px;' },
             { key: 'name', label: t('dashboard.products.columns.name'), width: 'w-48', class: 'expandable-cell', style: 'width: 200px; min-width: 200px;' },
@@ -173,16 +154,13 @@ export default {
             { key: 'categoryName', label: t('dashboard.products.columns.category'), width: 'w-40', class: 'expandable-cell', style: 'width: 150px; min-width: 150px;' }
         ]);
 
-        // Определяем роль пользователя
         const isAdmin = computed(() => getUserRole() === 'admin');
         const isSeller = computed(() => getUserRole() === 'seller');
 
-        // API хуки
         const { loading: productsLoading, execute: executeProductsFetch } = useApiRequest();
         const { loading: categoriesLoading, execute: executeCategoriesFetch } = useApiRequest();
         const { loading: deleteLoading, execute: executeDelete } = useApiRequest();
 
-        // Обработчик изменения сортировки
         const handleSortChange = () => {
             if (sortOption.value) {
                 const [key, order] = sortOption.value.split('_');
@@ -192,12 +170,11 @@ export default {
             }
         };
 
-        // Загрузка списка продуктов
         const fetchProducts = async () => {
             await executeProductsFetch(async () => {
-                const sellerId = isSeller.value ? "my" : undefined; // для админа не передаем sellerId
+                const sellerId = isSeller.value ? "my" : undefined;
                 const params = {
-                    page: currentPage.value, // API ожидает индекс страницы с нуля
+                    page: currentPage.value,
                     pageSize: pageSize.value,
                     search: filters.name || undefined,
                     orderBy: sortKey.value ? `${sortKey.value},${sortOrder.value}` : undefined,
@@ -225,7 +202,6 @@ export default {
             });
         };
 
-        // Загрузка списка категорий
         const fetchCategories = async () => {
             await executeCategoriesFetch(async () => {
                 return await categoryService.getAll();
@@ -240,7 +216,6 @@ export default {
             });
         };
 
-        // Функция инициализации данных
         const initializeData = () => {
             if (!isProductEditorRoute.value) {
                 fetchCategories();
@@ -248,9 +223,7 @@ export default {
             }
         };
 
-        // Наблюдение за изменениями маршрута, чтобы загружать данные при возврате с редактирования/создания
         watch(() => route.path, (newPath, oldPath) => {
-            // Если мы возвращаемся из редактирования или создания на список продуктов
             if (
                 (oldPath.includes('/dashboard/products/edit/') || oldPath.includes('/dashboard/products/create')) &&
                 newPath === '/dashboard/products'
@@ -259,16 +232,13 @@ export default {
             }
         });
 
-        // Загрузка данных при монтировании компонента
         onMounted(() => {
             initializeData();
-            // Инициализация значения sortOption
             sortOption.value = `${sortKey.value}_${sortOrder.value}`;
         });
 
-        // Обработчики событий
         const applyFilters = () => {
-            currentPage.value = 1; // Сбрасываем страницу при применении фильтров
+            currentPage.value = 1;
             fetchProducts();
         };
 
@@ -289,7 +259,6 @@ export default {
             fetchProducts();
         };
 
-        // Функции для навигации
         const openAddProductModal = () => {
             router.push('/dashboard/products/create');
         };
@@ -311,7 +280,7 @@ export default {
             }, {
                 onSuccess: () => {
                     toast.value.success(t('common.messages.deleteSuccess'));
-                    fetchProducts(); // Обновляем список после удаления
+                    fetchProducts();
                 },
                 showErrorNotification: true,
                 notificationRef: toast
@@ -321,7 +290,6 @@ export default {
             productToDelete.value = null;
         };
 
-        // Форматирование валюты
         const formatCurrency = (value) => {
             if (value === null || value === undefined) return '';
             return new Intl.NumberFormat(locale.value, {
@@ -332,7 +300,6 @@ export default {
             }).format(value);
         };
 
-        // Функция для передачи в AdminPanel
         const translateFunction = (key) => {
             return t(key);
         };
@@ -378,7 +345,6 @@ export default {
 </script>
 
 <style scoped>
-/* Дополнительные стили для таблицы */
 :deep(.expandable-cell) {
     max-width: none;
     white-space: normal;
@@ -392,15 +358,12 @@ export default {
     overflow: hidden;
 }
 
-/* Задаем общую ширину таблицы, чтобы она не растягивалась */
 :deep(table) {
     min-width: 1190px;
-    /* Сумма минимальных ширин всех колонок + actions column */
     width: 100%;
     table-layout: fixed;
 }
 
-/* Обеспечиваем, чтобы таблица была в контейнере, но не растягивала его */
 :deep(.table-container) {
     max-width: 100%;
     overflow-x: auto;

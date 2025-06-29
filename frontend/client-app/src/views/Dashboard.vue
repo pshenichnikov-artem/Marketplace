@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-col min-h-screen bg-gray-100">
-    <!-- Основной контент (растягивается) -->
     <div class="flex flex-grow h-screen">
-      <!-- Боковое меню (прижато к левому краю) -->
+      <!-- Боковое меню -->
       <aside class="w-64 bg-gray-900 text-white flex flex-col h-full fixed left-0 z-10 shadow-lg">
         <div class="p-5 border-b border-gray-800 flex items-center space-x-3">
           <div class="p-2 bg-indigo-600 rounded-lg">
@@ -16,7 +15,6 @@
             </svg>
           </div>
           <div class="flex flex-col">
-            <!-- Улучшенный заголовок с фиксированной шириной и без переноса -->
             <h2 class="text-lg font-bold text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">
               {{ $t('dashboard.title') }}
             </h2>
@@ -26,12 +24,11 @@
           </div>
         </div>
 
-        <!-- Переключатель языка -->
         <div class="px-5 py-3 border-b border-gray-800">
           <LanguageSwitcher />
         </div>
 
-        <!-- Навигационные элементы (растягиваются) -->
+        <!-- Навигационные элементы -->
         <nav class="flex-grow pt-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
           <ul class="space-y-1 px-3">
             <!-- Секция навигации для Admin -->
@@ -108,7 +105,7 @@
                   <span class="text-lg font-medium">{{ $t('dashboard.menu.banners') }}</span>
                 </router-link>
               </li>
-            
+
               <li>
                 <router-link to="/dashboard/pages"
                   class="flex items-center space-x-3 px-4 py-3.5 w-full text-left text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition duration-200"
@@ -121,7 +118,7 @@
                   <span class="text-lg font-medium">{{ $t('dashboard.menu.pages') }}</span>
                 </router-link>
               </li>
-           
+
             </template>
 
             <!-- Секция навигации для Seller -->
@@ -152,12 +149,10 @@
               </li>
             </template>
 
-            <!-- Общий разделитель -->
             <div class="my-4 border-t border-gray-800"></div>
           </ul>
         </nav>
 
-        <!-- Кнопки действий прижаты к низу меню -->
         <div class="p-4 border-t border-gray-800 mt-auto">
           <div class="space-y-3">
             <a href="/"
@@ -196,9 +191,7 @@
           </div>
         </header>
 
-        <!-- Content Area -->
         <div class="p-6">
-          <!-- Router View для компонентов -->
           <router-view class="mb-6" />
         </div>
       </main>
@@ -229,7 +222,6 @@ export default {
     const router = useRouter();
     const hasChildRoute = ref(false);
 
-    // Определить активный компонент на основе маршрута
     const updateActiveComponent = () => {
       const path = route.path;
 
@@ -256,7 +248,6 @@ export default {
       }
     };
 
-    // Наблюдение за изменениями маршрута
     watch(() => route.path, updateActiveComponent, { immediate: true });
 
     onMounted(() => {
@@ -336,13 +327,11 @@ export default {
   border-radius: 20px;
 }
 
-/* Эффект активного пункта меню */
 .router-link-active {
   background-color: rgba(79, 70, 229, 0.2);
   color: white;
 }
 
-/* Анимации для переходов страниц */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;

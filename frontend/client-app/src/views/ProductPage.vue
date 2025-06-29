@@ -2,7 +2,6 @@
   <div class="flex flex-col min-h-screen bg-gray-50">
     <MainNavbar />
     <main class="flex-grow container mx-auto px-4 py-8">
-      <!-- Используем StateWrapper для управления состояниями -->
       <StateWrapper :loading="loading" :error="error" :is-empty="!product">
         <!-- Информация о товаре -->
         <template #default>
@@ -43,7 +42,7 @@
                   </span>
                 </div>
 
-                <!-- Рейтинг в улучшенном дизайне -->
+                <!-- Рейтинг -->
                 <div class="flex items-center bg-gray-50 p-3 rounded-lg mb-6 shadow-sm">
                   <div class="flex items-center">
                     <StarRating :rating="product.rating" :size="24" :show-value="true" />
@@ -106,9 +105,7 @@
                 </div>
 
                 <div class="w-full">
-                  <!-- StateWrapper для операций с корзиной -->
                   <StateWrapper :loading="cartLoading">
-                    <!-- Кнопка "В корзину", если товара нет в корзине -->
                     <template #default>
                       <button v-if="!cartItem"
                         class="w-full bg-indigo-600 text-white py-3.5 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg active:scale-98 focus:ring-2 focus:ring-indigo-300"
@@ -121,7 +118,6 @@
                         <span class="text-base">{{ $t('product.addToCart') }}</span>
                       </button>
 
-                      <!-- Элементы управления количеством, если товар есть в корзине -->
                       <div v-else class="flex flex-col space-y-4">
                         <!-- Блок с управлением количеством -->
                         <div
@@ -185,7 +181,6 @@
             </div>
           </div>
 
-          <!-- Секция отзывов с использованием вынесенного компонента -->
           <ProductReviews :product-id="product.id" />
         </template>
       </StateWrapper>
@@ -230,11 +225,9 @@ export default {
     const cartStore = useCartStore();
     const fallbackImageUrl = ref('https://localhost:7037/images/no-image-placeholder.png'); // URL заглушки
 
-    // API хуки для разных операций
     const { loading, error, execute: executeProductLoad } = useApiRequest();
     const { loading: cartLoading, execute: executeCartOperation } = useApiRequest();
 
-    // Загрузка данных о продукте
     const fetchProductData = async (productId) => {
       await executeProductLoad(async () => {
         return await productService.getProductById(productId);
@@ -242,18 +235,15 @@ export default {
         onSuccess: async (data) => {
           product.value = data;
 
-          // Устанавливаем изображение по умолчанию
           selectedImageIndex.value = product.value.images.findIndex(img => img.isPrimary);
           if (selectedImageIndex.value === -1 && product.value.images.length > 0) {
             selectedImageIndex.value = 0;
           }
 
-          // Загружаем категорию
           if (product.value.categoryId) {
             await fetchCategory(product.value.categoryId);
           }
 
-          // Проверяем, есть ли этот товар в корзине, если корзина уже загружена
           if (cart.value?.items) {
             updateCartItem();
           }
@@ -263,7 +253,6 @@ export default {
       });
     };
 
-    // Загрузка категории
     const fetchCategory = async (categoryId) => {
       console.log('Fetching category with ID:', categoryId);
       const response = await categoryService.getById(categoryId);
@@ -272,7 +261,6 @@ export default {
       }
     };
 
-    // Загрузка корзины
     const fetchCart = async () => {
       await executeCartOperation(async () => {
         return await cartService.getCart("self");
@@ -284,7 +272,6 @@ export default {
       });
     };
 
-    // Обновление информации о товаре в корзине
     const updateCartItem = () => {
       if (product.value && cart.value?.items) {
         cartItem.value = cart.value.items.find(item =>
@@ -292,12 +279,10 @@ export default {
       }
     };
 
-    // Отслеживание изменений в продукте и корзине
     watch(() => [product.value?.id, cart.value?.items], () => {
       updateCartItem();
     });
 
-    // Добавление в корзину
     const addToCart = async () => {
       await executeCartOperation(async () => {
         const request = {
@@ -314,7 +299,6 @@ export default {
           };
           toast.value.success('Товар добавлен в корзину');
 
-          // Уведомляем MainNavbar о добавлении в корзину
           cartStore.delta(1);
         },
         showErrorNotification: true,
@@ -322,7 +306,6 @@ export default {
       });
     };
 
-    // Обновление количества в корзине
     const updateCartItemQuantity = async (change) => {
       if (!cartItem.value) return;
 
@@ -348,7 +331,6 @@ export default {
       });
     };
 
-    // Удаление из корзины
     const deleteCartItem = async () => {
       if (!cartItem.value) return;
 
@@ -359,7 +341,6 @@ export default {
           cartItem.value = null;
           toast.value.success('Товар удален из корзины');
 
-          // Уведомляем MainNavbar об удалении из корзины
           cartStore.delta(-1);
         },
         showErrorNotification: true,
@@ -367,7 +348,6 @@ export default {
       });
     };
 
-    // Выбор изображения
     const selectImage = (index) => {
       selectedImageIndex.value = index;
     };
@@ -389,7 +369,6 @@ export default {
       updateCartItemQuantity,
       deleteCartItem,
       selectedImage: () => {
-        // Проверяем наличие изображений и валидность индекса
         if (
           product.value?.images &&
           Array.isArray(product.value.images) &&
@@ -399,7 +378,6 @@ export default {
         ) {
           return product.value.images[selectedImageIndex.value];
         }
-        // Если изображений нет или индекс некорректный, возвращаем заглушку
         return { url: fallbackImageUrl.value };
       }
     };

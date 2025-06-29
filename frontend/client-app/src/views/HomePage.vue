@@ -4,11 +4,9 @@
     <main class="flex-grow bg-gray-50 py-8">
       <div class="container mx-auto px-4">
         <BannerCarousel @bannersLoaded="handleBannersLoaded" />
-        <!-- Здесь можно добавить другие секции главной страницы -->
       </div>
     </main>
 
-    <!-- Выносим компонент недавно просмотренных товаров за пределы main и помещаем его прямо перед футером -->
     <RecentlyViewedProducts v-if="showRecentProducts" />
     <AppFooter />
   </div>
@@ -32,16 +30,13 @@ export default {
     RecentlyViewedProducts
   },
   setup() {
-    // Состояние для управления отображением компонентов
     const showRecentProducts = ref(false);
     const { execute } = useApiRequest();
 
-    // Обработчик события загрузки баннеров
     const handleBannersLoaded = (hasBanners) => {
       console.log('Состояние баннеров получено в HomePage:', hasBanners);
     };
 
-    // Проверка наличия недавно просмотренных товаров
     const checkRecentlyViewed = async () => {
       try {
         await execute(async () => {

@@ -1,7 +1,6 @@
 ﻿<template>
   <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center transition-colors duration-200">
-      <!-- Иконка в зависимости от типа поля -->
       <svg v-if="icon === 'sort'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500" fill="none"
         viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -43,7 +42,6 @@
           :pattern="type === 'number' ? '[0-9]*' : null" v-model="localValue" :placeholder="placeholder"
           class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300 transition-all hover:bg-white hover:border-indigo-300"
           @blur="onValueChange" @keyup.enter="onValueChange" />
-        <!-- Иконка рубля для числовых полей -->
         <div v-if="type === 'currency'"
           class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
           ₽
@@ -86,7 +84,6 @@ export default {
     modelValue: {
       handler(newVal) {
         console.log(`BaseFilterField ${this.label} received new modelValue:`, newVal);
-        // Для чисел конвертируем в строку для отображения в input
         if (this.type === 'number' && newVal !== null && newVal !== undefined) {
           this.localValue = String(newVal);
         } else {
@@ -98,7 +95,6 @@ export default {
   },
   methods: {
     onValueChange() {
-      // Если тип number, нам нужно преобразовать строку в число
       let value = this.localValue;
       if (this.type === 'number' && value !== null && value !== '' && value !== undefined) {
         value = Number(value);
@@ -117,7 +113,6 @@ export default {
 </script>
 
 <style scoped>
-/* Кастомные стили для фокуса */
 .focus-visible:focus {
   outline: 2px solid #4f46e5;
   outline-offset: 2px;

@@ -1,9 +1,8 @@
 <template>
     <div class="max-w-5xl mx-auto">
-        <!-- Используем общий компонент EntityEditor в качестве оболочки -->
         <EntityEditor :title="$t('entityEditor.order.title.edit')" :back-link="'/dashboard/orders'" @back="handleBack"
             @save="saveOrder" :is-saving="isSaving">
-            <!-- Дополнительные действия в шапке -->
+
             <template v-if="isAdmin" #actions>
                 <button v-if="order.status !== 'cancelled'" @click="confirmCancelOrder"
                     class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center shadow-sm hover:shadow-md">
@@ -61,7 +60,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Статус заказа с возможностью изменения для админа -->
                                     <div class="flex items-center">
                                         <div class="w-1/3 font-medium text-gray-600">
                                             {{ $t('entityEditor.order.status') }}:
@@ -82,9 +80,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Правая колонка с информацией о клиенте -->
                                 <div class="space-y-4">
-                                    <!-- Имя клиента -->
                                     <div v-if="order.user" class="flex items-center">
                                         <div class="w-1/3 font-medium text-gray-600">
                                             {{ $t('entityEditor.order.customer') }}:
@@ -94,7 +90,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Email клиента -->
                                     <div v-if="order.user" class="flex items-center">
                                         <div class="w-1/3 font-medium text-gray-600">
                                             {{ $t('entityEditor.order.email') }}:
@@ -104,7 +99,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Статус оплаты -->
                                     <div class="flex items-center">
                                         <div class="w-1/3 font-medium text-gray-600">
                                             {{ $t('entityEditor.order.payment') }}:
@@ -139,7 +133,6 @@
                         </div>
                     </div>
 
-                    <!-- Товары в заказе -->
                     <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
                             <div class="flex items-center">
@@ -153,7 +146,6 @@
                                 <h3 class="font-semibold text-gray-800">{{ $t('entityEditor.order.items') }}</h3>
                             </div>
 
-                            <!-- Кнопка добавления товара (только для админа) -->
                             <button v-if="isAdmin" @click="showAddProductModal = true"
                                 class="text-xs bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition-colors">
                                 {{ $t('entityEditor.order.addItem') }}
@@ -268,7 +260,6 @@
                         </div>
                     </div>
 
-                    <!-- Адрес доставки -->
                     <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500"
@@ -281,7 +272,6 @@
                         </div>
                         <div class="p-5">
                             <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-                                <!-- Адрес доставки - доступно для редактирования всем пользователям -->
                                 <div class="space-y-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
                                         {{ $t('entityEditor.order.address') }}:
@@ -297,7 +287,6 @@
             </div>
         </EntityEditor>
 
-        <!-- Модальное окно добавления товара -->
         <div v-if="showAddProductModal"
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col">
@@ -392,13 +381,11 @@
             </div>
         </div>
 
-        <!-- Модальное окно подтверждения отмены заказа -->
         <ConfirmModal v-if="showCancelModal" :title="$t('entityEditor.order.confirmCancelTitle')"
             :message="$t('entityEditor.order.confirmCancelMessage')"
             :confirm-text="$t('entityEditor.order.confirmCancel')" :cancel-text="$t('entityEditor.order.cancelAction')"
             @confirm="cancelOrder" @cancel="showCancelModal = false" />
 
-        <!-- Уведомления -->
         <Notification ref="toast" />
     </div>
 </template>
@@ -414,7 +401,7 @@ import orderService from '@/services/api/orderService';
 import productService from '@/services/api/productService';
 import useApiRequest from '@/hooks/useApiRequest';
 import { getUserRole } from '@/utils/localStorage';
-import { getStatusInfo } from '@/utils/statusUtils'; // Импортируем функцию из statusUtils
+import { getStatusInfo } from '@/utils/statusUtils';
 
 export default {
     name: 'OrderEditor',
@@ -437,17 +424,15 @@ export default {
         const router = useRouter();
         const route = useRoute();
 
-        // Определяем роль пользователя
         const isAdmin = computed(() => getUserRole() === 'admin');
         const isSeller = computed(() => { return getUserRole() === 'seller' });
 
-        // Состояния
         const isLoading = ref(true);
         const isSaving = ref(false);
         const showCancelModal = ref(false);
         const showAddProductModal = ref(false);
         const showQuantityModal = ref(false);
-        const isEditingItem = ref(null); // индекс редактируемого товара или null
+        const isEditingItem = ref(null);
         const productSearch = ref('');
         const newItemQuantity = ref(1);
         const selectedProduct = ref(null);
@@ -463,10 +448,8 @@ export default {
             { label: t('dashboard.orders.status.cancelled'), value: 'cancelled' }
         ]);
 
-        // Для отслеживания изменений
         const originalOrder = ref({});
 
-        // Данные заказа
         const order = reactive({
             id: null,
             orderDate: '',
@@ -479,19 +462,15 @@ export default {
             notes: ''
         });
 
-        // Доступные статусы заказов из statusUtils
         const availableOrderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'completed', 'cancelled'];
 
-        // Детали товаров в заказе
         const orderItems = ref([]);
 
-        // Общая сумма заказа
         const orderTotal = computed(() => {
             return orderItems.value.reduce((total, item) =>
                 total + (item.price * item.quantity), 0);
         });
 
-        // Фильтрация продуктов для поиска
         const filteredProducts = computed(() => {
 
             if (!productSearch.value) return allProducts.value;
@@ -503,15 +482,12 @@ export default {
             );
         });
 
-        // Проверка на наличие изменений
         const hasChanges = computed(() => {
-            // Сравниваем базовые поля
             if (order.status !== originalOrder.value.status) return true;
             if (order.paymentStatus !== originalOrder.value.paymentStatus) return true;
             if (order.shippingAddress !== originalOrder.value.shippingAddress) return true;
             if (order.notes !== originalOrder.value.notes) return true;
 
-            // Сравниваем элементы заказа (количество, товары, цена)
             if (orderItems.value.length !== originalOrder.value.items?.length) return true;
 
             for (let i = 0; i < orderItems.value.length; i++) {
@@ -527,20 +503,17 @@ export default {
             return false;
         });
 
-        // API хуки
         const { loading, execute: executeOrderFetch } = useApiRequest();
         const { loading: savingOrder, execute: executeSaveOrder } = useApiRequest();
         const { loading: loadingProducts, execute: executeLoadProducts } = useApiRequest();
         const { loading: cancellingOrder, execute: executeCancelOrder } = useApiRequest();
         const { loading: enrichingOrder, execute: executeProductEnrichment } = useApiRequest();
 
-        // Отслеживаем состояние загрузки для индикатора сохранения
         watch(savingOrder, (isSavingNow) => {
             console.log('Saving state changed:', isSavingNow);
             isSaving.value = isSavingNow;
         });
 
-        // Получение списка продуктов
         const fetchProducts = async () => {
             if (!isAdmin.value) return;
             console.error(getUserRole())
@@ -548,7 +521,7 @@ export default {
                 return await productService.getProducts(0,
                     productSearch.value || '',
                     null, null, null,
-                    100, // Увеличиваем количество загружаемых товаров
+                    100,
                     null, null);
             }, {
                 onSuccess: (data) => {
@@ -561,7 +534,6 @@ export default {
             });
         };
 
-        // Загрузка заказа
         const fetchOrderDetails = async () => {
             if (!props.id) return;
 
@@ -574,17 +546,14 @@ export default {
                     if (data) {
                         console.log('Order data:', data);
 
-                        // Сохраняем базовые данные заказа
                         order.id = data.id;
                         order.orderDate = data.orderDate;
                         order.status = data.status || 'pending';
                         order.user = data.customer;
                         order.payment = data.payment;
                         order.paymentStatus = data.payment ? 'paid' : 'pending';
-                        // Инициализация поля адреса - если адрес отсутствует, используем пустую строку
                         order.shippingAddress = data.shippingAddress || '';
 
-                        // Сохраняем оригинал для отслеживания изменений
                         originalOrder.value = {
                             status: data.status || 'pending',
                             paymentStatus: data.payment ? 'paid' : 'pending',
@@ -594,7 +563,6 @@ export default {
                         };
 
 
-                        // Обработка элементов заказа
                         if (data.items && Array.isArray(data.items)) {
                             orderItems.value = data.items.map(item => ({
                                 productId: item.productId,
@@ -624,11 +592,9 @@ export default {
             });
         };
 
-        // Обогащаем заказ информацией о продуктах
         const enrichOrderWithProductInfo = async () => {
             if (!orderItems.value || orderItems.value.length === 0) return;
 
-            // Обрабатываем элементы заказа последовательно, чтобы обогатить их информацией о продуктах
             for (const item of orderItems.value) {
                 await executeProductEnrichment(async () => {
                     return await productService.getProductById(item.productId);
@@ -647,12 +613,9 @@ export default {
             }
         };
 
-        // Сохранение заказа
         const saveOrder = async () => {
             console.log("Is edit");
-            // Проверяем, есть ли элемент в режиме редактирования
             if (isEditingItem.value !== null) {
-                // Если есть элемент в режиме редактирования, показываем пользователю сообщение
                 toast.value.info(t('entityEditor.order.finishEditingItem'));
                 return;
             }
@@ -678,14 +641,13 @@ export default {
                     router.push('/dashboard/orders');
                 },
                 onError: () => {
-                    // При ошибке флаг загрузки будет автоматически сброшен хуком useApiRequest
+
                 },
                 showErrorNotification: true,
                 notificationRef: toast
             });
         };
 
-        // Редактирование элемента заказа
         const startEditItem = (index) => {
             isEditingItem.value = index;
 
@@ -697,12 +659,10 @@ export default {
 
         };
 
-        // Удаление элемента заказа
         const removeOrderItem = (index) => {
             orderItems.value.splice(index, 1);
         };
 
-        // Выбор товара для добавления
         const selectProduct = (product) => {
             selectedProduct.value = product;
             newItemQuantity.value = 1;
@@ -710,13 +670,11 @@ export default {
             showQuantityModal.value = true;
         };
 
-        // Отмена выбора товара
         const cancelProductSelection = () => {
             selectedProduct.value = null;
             showQuantityModal.value = false;
         };
 
-        // Добавление товара в заказ
         const addProductToOrder = () => {
             const product = selectedProduct.value;
             if (!product) return;
@@ -727,7 +685,6 @@ export default {
             if (existingItemIndex >= 0) {
                 toast.value.error(t('entityEditor.order.itemAlreadyExists'));
             } else {
-                // Если товара нет, добавляем новый
                 orderItems.value.push({
                     productId: product.id,
                     productName: product.name,
@@ -742,7 +699,6 @@ export default {
             showQuantityModal.value = false;
         };
 
-        // Форматирование даты
         const formatDate = (dateString) => {
             if (!dateString) return '';
             const date = new Date(dateString);
@@ -755,7 +711,6 @@ export default {
             }).format(date);
         };
 
-        // Форматирование даты в простом формате
         const formatDateSimple = (dateString) => {
             if (!dateString) return '';
             const date = new Date(dateString);
@@ -769,7 +724,6 @@ export default {
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         };
 
-        // Форматирование валюты
         const formatCurrency = (value) => {
             if (value === null || value === undefined) return '';
             return new Intl.NumberFormat(locale.value, {
@@ -780,7 +734,6 @@ export default {
             }).format(value);
         };
 
-        // Получение класса для бейджа статуса
         const getStatusBadgeClass = (status) => {
             const classes = {
                 'pending': 'bg-yellow-100 text-yellow-800',
@@ -793,26 +746,22 @@ export default {
             return classes[status.toLowerCase()] || 'bg-gray-100 text-gray-800';
         };
 
-        // Метод для получения класса статуса с помощью утилиты
         const getStatusClass = (status) => {
             if (!status) return 'bg-gray-100 text-gray-800';
             const statusInfo = getStatusInfo(status, 'order');
             return statusInfo.cssClass;
         };
 
-        // Метод для получения переведенного статуса
         const getTranslatedStatus = (status) => {
             if (!status) return '';
             const statusInfo = getStatusInfo(status, 'orders');
             return t(statusInfo.translationPath);
         };
 
-        // Показать модальное окно подтверждения отмены заказа
         const confirmCancelOrder = () => {
             showCancelModal.value = true;
         };
 
-        // Отмена заказа
         const cancelOrder = async () => {
             await executeCancelOrder(async () => {
                 return await orderService.cancelOrder(order.id);
@@ -831,19 +780,16 @@ export default {
             });
         };
 
-        // Возврат на страницу списка заказов
         const handleBack = () => {
             router.push('/dashboard/orders');
         };
 
-        // Загрузка данных при монтировании компонента
         onMounted(() => {
 
             fetchOrderDetails();
             fetchProducts();
         });
 
-        // Наблюдение за изменением ID заказа в URL
         watch(() => props.id, (newId) => {
             if (newId) {
                 fetchOrderDetails();
@@ -884,7 +830,7 @@ export default {
             confirmCancelOrder,
             cancelOrder,
             handleBack,
-            saveOrder // Явно возвращаем функцию saveOrder
+            saveOrder
         };
     }
 };

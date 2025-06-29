@@ -18,12 +18,10 @@
           </router-link>
         </div>
 
-        <!-- Поиск - всегда виден -->
         <div class="flex-1 mx-6">
           <NavbarSearch />
         </div>
 
-        <!-- Кнопки навигации - показаны на десктопе (теперь только от 1024px и выше) -->
         <nav class="hidden lg:flex items-center space-x-1">
           <router-link to="/catalog"
             class="px-3 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200 flex items-center font-medium"
@@ -36,7 +34,6 @@
             {{ $t('navbar.catalog') }}
           </router-link>
 
-          <!-- Добавляем ссылку на панель управления для seller -->
           <router-link v-if="isSeller || isAdmin" to="/dashboard"
             class="px-3 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200 flex items-center font-medium"
             active-class="bg-indigo-50 text-indigo-700">
@@ -48,7 +45,6 @@
             {{ $t('navbar.dashboard') }}
           </router-link>
 
-          <!-- Скрыть ссылку на профиль для админа -->
           <router-link v-if="isAuthenticated && !isAdmin" to="/profile"
             class="px-3 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200 flex items-center font-medium"
             active-class="bg-indigo-50 text-indigo-700">
@@ -60,7 +56,6 @@
             {{ $t('navbar.profile') }}
           </router-link>
 
-          <!-- Отображаем корзину только для обычных пользователей -->
           <router-link v-if="!isSellerOrAdmin" to="/cart"
             class="relative px-3 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200 flex items-center font-medium"
             active-class="bg-indigo-50 text-indigo-700">
@@ -76,7 +71,6 @@
             </span>
           </router-link>
 
-          <!-- Переключатель языка -->
           <div class="px-3 py-2">
             <LanguageSwitcher />
           </div>
@@ -102,9 +96,7 @@
           </button>
         </nav>
 
-        <!-- Мобильные иконки (теперь отображаются на экранах до 1024px) -->
         <div class="flex items-center lg:hidden space-x-2">
-          <!-- Иконка корзины только для обычных пользователей -->
           <router-link v-if="!isSellerOrAdmin" to="/cart"
             class="relative p-2 rounded-full hover:bg-indigo-50 transition-colors duration-200">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24"
@@ -118,7 +110,6 @@
             </span>
           </router-link>
 
-          <!-- Кнопка меню (теперь отображается на экранах до 1024px) -->
           <button @click="toggleMobileMenu" class="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
             data-menu-btn type="button" aria-label="Меню">
             <svg v-if="!mobileMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none"
@@ -135,7 +126,6 @@
         </div>
       </div>
 
-      <!-- Мобильное меню (теперь отображается на экранах до 1024px) -->
       <div v-if="mobileMenuOpen" class="lg:hidden pb-4 animate-fadeIn">
         <nav class="flex flex-col space-y-3 mt-2">
           <router-link to="/catalog" @click="mobileMenuOpen = false"
@@ -149,7 +139,6 @@
             {{ $t('navbar.catalog') }}
           </router-link>
 
-          <!-- Добавляем ссылку на панель управления для seller в мобильном меню -->
           <router-link v-if="isSeller" to="/dashboard" @click="mobileMenuOpen = false"
             class="px-4 py-3 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex items-center font-medium"
             active-class="bg-indigo-50 text-indigo-700">
@@ -161,7 +150,6 @@
             {{ $t('navbar.dashboard') }}
           </router-link>
 
-          <!-- Скрыть ссылку на профиль для админа в мобильном меню -->
           <router-link v-if="isAuthenticated && !isAdmin" to="/profile" @click="mobileMenuOpen = false"
             class="px-4 py-3 rounded-lg text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex items-center font-medium"
             active-class="bg-indigo-50 text-indigo-700">
@@ -173,7 +161,6 @@
             {{ $t('navbar.profile') }}
           </router-link>
 
-          <!-- Переключатель языка в мобильном меню -->
           <div class="px-4 py-3 flex justify-start">
             <LanguageSwitcher />
           </div>
@@ -248,7 +235,6 @@ export default {
     window.addEventListener('resize', this.handleResize);
     document.addEventListener('click', this.handleOutsideClick);
 
-    // Инициализация и настройка отслеживания через Pinia
     this.setupCartWatcher();
   },
   beforeUnmount() {
@@ -259,13 +245,10 @@ export default {
     setupCartWatcher() {
       const cartStore = useCartStore();
 
-      // Отслеживаем изменения в хранилище корзины
       watch(() => cartStore.cartItemsCountDelta, (newDelta) => {
         if (newDelta !== 0) {
-          // Обновляем счетчик товаров в корзине на величину дельты
           this.cartItemsCount += newDelta;
 
-          // Сбрасываем дельту в 0
           cartStore.$patch({ cartItemsCountDelta: 0 });
         }
       });
@@ -293,18 +276,15 @@ export default {
       const header = document.querySelector('header');
       const menuBtn = document.querySelector('[data-menu-btn]');
 
-      // Пропускаем обработку клика по самой кнопке меню и её дочерним элементам
       if (menuBtn && (menuBtn === event.target || menuBtn.contains(event.target))) {
         return;
       }
 
-      // Закрываем меню, если клик был вне заголовка
       if (this.mobileMenuOpen && !header.contains(event.target)) {
         this.mobileMenuOpen = false;
       }
     },
     async getCartItemsCount() {
-      // Не выполняем запрос для seller и admin
       if (!this.isAuthenticated || this.isSellerOrAdmin) {
         this.cartItemsCount = 0;
         return;
@@ -343,18 +323,14 @@ export default {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
-/* Улучшение кликабельности кнопок на мобильных устройствах */
 @media (max-width: 1023px) {
 
   button,
   a {
     min-height: 44px;
-    /* Минимальная высота для сенсорных устройств */
     min-width: 44px;
-    /* Минимальная ширина для сенсорных устройств */
   }
 
-  /* Увеличение активной области кнопок */
   nav a,
   nav button {
     display: flex;

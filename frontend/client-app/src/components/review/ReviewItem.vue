@@ -54,7 +54,6 @@
         :message="t('profile.confirmDeleteMessage')" :confirm-text="t('profile.deleteButton')"
         :cancel-text="t('profile.cancelButton')" @confirm="deleteReview" @cancel="cancelDelete" />
 
-    <!-- Компонент уведомлений -->
     <Notification ref="toast" />
 </template>
 
@@ -92,7 +91,6 @@ export default {
         const showDeleteModal = ref(false);
         const { loading: deleteLoading, execute: executeDelete } = useApiRequest();
 
-        // Форматирование даты
         const formatDate = (dateString) => {
             if (!dateString) return '';
             const date = new Date(dateString);
@@ -103,17 +101,14 @@ export default {
             }).format(date);
         };
 
-        // Показываем модальное окно подтверждения удаления
         const confirmDelete = () => {
             showDeleteModal.value = true;
         };
 
-        // Скрываем модальное окно
         const cancelDelete = () => {
             showDeleteModal.value = false;
         };
 
-        // Удаление отзыва
         const deleteReview = async () => {
             await executeDelete(async () => {
                 return await reviewService.deleteReviewById(props.review.id);

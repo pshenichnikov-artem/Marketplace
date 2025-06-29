@@ -1,11 +1,8 @@
 <template>
     <div class="space-y-6">
-        <!-- Проверяем, не находимся ли мы на странице редактирования или создания страницы -->
         <router-view v-if="isPageEditorRoute"></router-view>
 
-        <!-- Если не находимся на странице редактирования, показываем список страниц -->
         <template v-else>
-            <!-- Header with actions -->
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-bold text-gray-800">{{ $t('dashboard.pages.title') }}</h1>
                 <button @click="createNewPage" class="btn-primary">
@@ -19,18 +16,15 @@
                 </button>
             </div>
 
-            <!-- Loading state -->
             <div v-if="isLoading" class="flex justify-center py-10">
                 <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
             </div>
 
-            <!-- Error state -->
             <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-center text-red-700">
                 {{ error }}
                 <button @click="loadPages" class="underline ml-2">{{ $t('dashboard.pages.tryAgain') }}</button>
             </div>
 
-            <!-- Empty state -->
             <div v-else-if="pages.length === 0"
                 class="text-center py-10 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none"
@@ -46,7 +40,6 @@
                 </button>
             </div>
 
-            <!-- Pages list -->
             <div v-else class="bg-white shadow-md rounded-lg overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -91,7 +84,6 @@
                 </div>
             </div>
 
-            <!-- Delete confirmation modal -->
             <ConfirmModal v-if="showDeleteModal" :title="$t('dashboard.pages.deletePageTitle')"
                 :message="$t('dashboard.pages.deletePageMessage', { pageKey: pageToDelete?.pageKey || '' })"
                 :confirm-text="$t('dashboard.pages.confirmDelete')" :cancel-text="$t('dashboard.pages.cancel')"
@@ -123,23 +115,19 @@ export default {
         const route = useRoute();
         const toast = ref(null);
 
-        // State
         const pages = ref([]);
         const isLoading = ref(false);
         const error = ref(null);
 
-        // Modal state
         const showDeleteModal = ref(false);
         const pageToDelete = ref(null);
 
-        // Проверка находимся ли мы на странице редактора
         const isPageEditorRoute = computed(() => {
             return route.name === 'page-create' || route.name === 'page-edit';
         });
 
         const { loading, execute } = useApiRequest();
 
-        // Load pages from API
         const loadPages = async () => {
             isLoading.value = true;
             error.value = null;
@@ -159,35 +147,30 @@ export default {
             }
         };
 
-        // Create new page
         const createNewPage = () => {
             router.push({ name: 'page-create' });
         };
 
-        // Edit existing page
         const editPage = (page) => {
             router.push({
                 name: 'page-edit',
                 params: {
                     pageKey: page.pageKey,
-                    language: page.language || 'ru'  // Передаем язык как параметр
+                    language: page.language || 'ru'
                 }
             });
         };
 
-        // Confirm page deletion
         const confirmDelete = (page) => {
             pageToDelete.value = page;
             showDeleteModal.value = true;
         };
 
-        // Cancel page deletion
         const cancelDelete = () => {
             showDeleteModal.value = false;
             pageToDelete.value = null;
         };
 
-        // Delete page
         const deletePage = async () => {
             if (!pageToDelete.value) return;
 
@@ -196,7 +179,7 @@ export default {
             }, {
                 onSuccess: () => {
                     toast.value.success(t('dashboard.pages.deleteSuccess'));
-                    loadPages(); // Reload pages
+                    loadPages();
                 },
                 showErrorNotification: true,
                 notificationRef: toast
@@ -206,7 +189,6 @@ export default {
             pageToDelete.value = null;
         };
 
-        // Наблюдение за изменениями маршрута для обновления списка при возврате
         watch(() => route.name, (newName, oldName) => {
             if ((oldName === 'page-edit' || oldName === 'page-create') && newName === 'dashboard-pages') {
                 loadPages();
@@ -219,7 +201,6 @@ export default {
             }
         });
 
-        // Функция для отображения языка в удобном для чтения формате
         const getLanguageDisplay = (langCode) => {
             switch (langCode) {
                 case 'ru': return 'Русский';
@@ -228,7 +209,6 @@ export default {
             }
         };
 
-        // Функция для определения класса бейджа языка
         const getLanguageBadgeClass = (langCode) => {
             switch (langCode) {
                 case 'ru': return 'bg-blue-100 text-blue-800';

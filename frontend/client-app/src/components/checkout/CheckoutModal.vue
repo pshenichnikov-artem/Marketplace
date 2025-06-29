@@ -118,7 +118,6 @@
                 </form>
             </div>
 
-            <!-- Добавляем компонент уведомлений -->
             <ToastNotification ref="toast" />
         </div>
     </div>
